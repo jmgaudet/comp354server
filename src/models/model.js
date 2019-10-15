@@ -122,4 +122,8 @@ module.exports = class Model {
     toJson() {
         throw new Error(`Did not override toJson() in the model ${this.constructor.getClassName()}`);
     }
+
+    toString() {
+        return JSON.stringify(this.toJson());
+    }
 };
