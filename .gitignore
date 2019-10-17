@@ -1,5 +1,13 @@
 .env
 .DS_Store
+public/products/*.jpg
+public/products/*.jpeg
+public/products/*.gif
+public/products/*.png
+public/profiles/*.jpg
+public/profiles/*.jpeg
+public/profiles/*.gif
+public/profiles/*.png
 
 # Created by https://www.gitignore.io/api/node,webstorm+all
 # Edit at https://www.gitignore.io/?templates=node,webstorm+all
