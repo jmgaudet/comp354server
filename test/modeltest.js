@@ -134,5 +134,44 @@ describe('Model', function() {
             sql = foo.delete(null, true);
             assert.strictEqual(sql, "delete from `foo` where `id` = 0");
         });
+
+        it('Should automatically instanciate all properties from a DB row', () => {
+
+            let now = new Date();
+
+            let mockDbRow = {
+                id: 1,
+                bar: "bar",
+                bazz: "bazz",
+                created: now
+            };
+
+            class Foo extends Model {
+                constructor(dbRow){
+                    super(dbRow);
+                }
+
+                static getTable() {
+                    return "foo";
+                }
+
+                toJson() {
+                    return {
+                        id: this.id,
+                        bar: this.bar,
+                        bazz: this.bazz,
+                        created: this.created
+                    }
+                }
+            };
+
+            let foo = new Foo(mockDbRow);
+
+            assert.strictEqual(foo.id, 1);
+            assert.strictEqual(foo.bar, "bar");
+            assert.strictEqual(foo.bazz, "bazz");
+            assert.strictEqual(foo.created, now);
+
+        });
     });
 });

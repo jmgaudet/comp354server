@@ -18,8 +18,9 @@ module.exports = class Model {
 
     constructor(dbRow) {
         if(dbRow) {
+            let _this = this;
             Object.keys(dbRow).forEach(function(key) {
-                this[key] = dbRow[key];
+                _this[key] = dbRow[key];
             });
         } else {
             this.id = 0;
