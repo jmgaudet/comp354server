@@ -60,7 +60,7 @@ module.exports = class Model {
             if(err) {
                 callback(err,null);
             } else {
-                let model = new this(res.rows[0]);
+                let model = new this(res[0]);
                 callback(null, model);
             }
         });
@@ -108,7 +108,7 @@ module.exports = class Model {
             if(err) {
                 callback(err);
             } else {
-                callback(null, results.rows);
+                callback(null, results);
             }
         });
 
