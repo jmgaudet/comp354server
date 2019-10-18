@@ -21,6 +21,7 @@ module.exports = class ProductController {
             Product.getAll((err, products) => {
                 if(err) {
                     res.send(Response.makeResponse(false, err.toString()));
+                    return;
                 }
 
                 let p = [];
@@ -28,6 +29,7 @@ module.exports = class ProductController {
                     product.getCompleteObject((err, json) => {
                         if(err) {
                             res.send(Response.makeResponse(false, err.toString()));
+                            return;
                         }
                         p.push(json);
                     });
@@ -43,16 +45,30 @@ module.exports = class ProductController {
 
     }
 
+    /**
+     * Return a single product by ID
+     * @param req
+     * @param res
+     */
     static getProduct(req, res) {
         try {
             let id = req.params.id;
             Product.fromId(id, (err, product) => {
                 if(err) {
                     res.send(Response.makeResponse(false, err.toString()));
+                    return;
                 }
+
                 let success = !!product;
                 let message = success ? 'Product found' : 'Product not found';
-                res.send(Response.makeResponse(success, message, product))
+
+                if(success) {
+                    product.getCompleteObject((err, json) => {
+                        res.send(Response.makeResponse(success, message, json));
+                    });
+                } else {
+                    res.send(Response.makeResponse(success, message));
+                }
             });
         } catch(e) {
             res.send(Response.makeResponse(false, e.toString()));

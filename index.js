@@ -19,16 +19,29 @@ app.get('/', (req, res) => {
     res.send('Hello World!');
 });
 
-/**
- * Return all products
+/* Return all products by page
+route: /products?page=<page>&max=<max results>
  */
 app.get('/products', (req, res) => {
     ProductController.getAllProducts(req, res);
 });
 
+/* Return a single product by id
+route: /products/<product id>
+ */
 app.get('/products/:id', (req, res) => {
     ProductController.getProduct(req, res);
 });
+
+/* Add a new product
+route: /products
+post fields:
+-
+ */
+app.post('/products', productImageUploads.any(), (req, res) => {
+
+});
+
 
 /*================== End Routes =====================*/
 
