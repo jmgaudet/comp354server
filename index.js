@@ -23,17 +23,11 @@ app.get('/', (req, res) => {
  * Return all products
  */
 app.get('/products', (req, res) => {
-    let page = req.query.page ? req.query.page : 1;
-    let max = req.query.max ? req.query.max : 10;
+    ProductController.getAllProducts(req, res);
+});
 
-    ProductController.getAllProducts((err, products) => {
-        if(err) {
-            res.send(Response.makeResponse(false, err.toString()));
-        } else {
-            res.send(Response.makeResponse(true, `Got page ${page}`, products));
-        }
-    }, page, max);
-
+app.get('/products/:id', (req, res) => {
+    ProductController.getProduct(req, res);
 });
 
 /*================== End Routes =====================*/
