@@ -3,8 +3,8 @@ const path = require('path');
 const express = require('express');
 const multer  = require('multer');
 const app = express();
-const Response = require('./src/api/response.js');
-const ProductController = require('./src/controllers/productcontroller.js');
+const Response = require('./src/api/response');
+const ProductController = require('./src/controllers/productcontroller');
 
 const publicDirectory = path.join(__dirname, 'public');
 const productImageUploads = multer({storage: getProductImageStorage()});
@@ -33,6 +33,7 @@ app.get('/products', (req, res) => {
             res.send(Response.makeResponse(true, `Got page ${page}`, products));
         }
     }, page, max);
+
 });
 
 /*================== End Routes =====================*/

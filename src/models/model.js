@@ -90,8 +90,9 @@ module.exports = class Model {
                 let r = [];
                 res.forEach((obj) => {
                     let model = new this(obj);
-                    callback(null, model);
+                    r.push(model);
                 });
+                callback(null, r);
             }
         });
 

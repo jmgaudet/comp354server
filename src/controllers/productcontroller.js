@@ -27,7 +27,7 @@ module.exports = class ProductController {
                     }
                     p.push(json);
                 });
-            })
+            });
 
             callback(null, p);
 
