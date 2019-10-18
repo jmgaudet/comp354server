@@ -60,8 +60,38 @@ module.exports = class Model {
             if(err) {
                 callback(err,null);
             } else {
-                let model = new this(res.rows[0]);
+                let model = new this(res[0]);
                 callback(null, model);
+            }
+        });
+
+        return db.format(query, params);
+    }
+
+    /**
+     * Get all of the objects of this type by page
+     * @param callback
+     * @param page
+     * @param resultsPerPage
+     * @param dryRun
+     * @returns {string}
+     */
+    static getAll(callback, page = 1, resultsPerPage = 20, dryRun = false) {
+        const db = require('../db/database');
+
+        let start = (page - 1) * resultsPerPage;
+        const query = 'select * from ?? limit ?,?';
+        const params = [this.getTable(), start, resultsPerPage];
+
+        if(!dryRun) db.query(query, params, (err, res) => {
+            if(err) {
+                callback(err,null);
+            } else {
+                let r = [];
+                res.forEach((obj) => {
+                    let model = new this(obj);
+                    callback(null, model);
+                });
             }
         });
 
@@ -108,7 +138,7 @@ module.exports = class Model {
             if(err) {
                 callback(err);
             } else {
-                callback(null, results.rows);
+                callback(null, results);
             }
         });
 
