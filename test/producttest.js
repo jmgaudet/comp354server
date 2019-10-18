@@ -18,7 +18,7 @@ describe('Product', () => {
         }
     ];
 
-    it('Should instanciate a Product instance from a database row', () => {
+    it('Should instantiate a Product instance from a database row', () => {
 
         let product = new Product(mockProductResults[0]);
 
