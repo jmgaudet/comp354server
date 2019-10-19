@@ -16,8 +16,10 @@ module.exports = class ProductController {
      */
     static getAllProducts(req, res) {
         try{
-            let page = req.query.page ? req.query.page : 1;
-            let max = req.query.max ? req.query.max : 10;
+            let page = req.query.page && req.query.page > 0 ? parseInt(req.query.page) : 1;
+            let max = req.query.max && req.query.max > 0 ? parseInt(req.query.max) : 10;
+            let sort = req.query.sort;
+            let asc = !!req.query.asc;
 
             Product.getAllSorted((err, products, pageCount) => {
                 if(err) {
@@ -27,7 +29,7 @@ module.exports = class ProductController {
 
                 res.send(Response.makeResponse(true, `Got page ${page}`, products, pageCount));
 
-            }, page, max);
+            }, page, max, sort, asc);
 
         }catch (e) {
             res.send(Response.makeResponse(false, e.toString()));

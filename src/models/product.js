@@ -22,6 +22,7 @@ module.exports = class Product extends Model{
             }
             let count = results[0].count;
             let pageCount = Math.ceil(count/max);
+            let start = (page - 1) * max;
 
             let query = `SELECT 
                         p.*,
@@ -38,8 +39,8 @@ module.exports = class Product extends Model{
                         ProductsImages i ON i.productId = p.id
                             LEFT JOIN
                         Categories c ON c.id = pc.categoryId
-                    order by ?? ${asc ? 'ASC' : 'DESC'}`;
-            let params = [orderColumn];
+                    order by ?? ${asc ? 'ASC' : 'DESC'} limit ?,?`;
+            let params = [orderColumn, start, max];
 
             db.query(query, params, (err, products) => {
                 if(err) {
