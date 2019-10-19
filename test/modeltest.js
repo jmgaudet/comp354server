@@ -133,6 +133,7 @@ describe('Model', function() {
 
             sql = foo.delete(null, true);
             assert.strictEqual(sql, "delete from `foo` where `id` = 0");
+
         });
 
         it('Should automatically instanciate all properties from a DB row', () => {
@@ -173,5 +174,30 @@ describe('Model', function() {
             assert.strictEqual(foo.created, now);
 
         });
+
+        it('Should return all products with pagination', () => {
+
+            class Foo extends Model {
+                constructor(dbRow){
+                    super(dbRow);
+                }
+
+                static getTable() {
+                    return "foo";
+                }
+
+                toJson() {
+                    return {
+                        id: this.id,
+                        bar: this.bar,
+                        bazz: this.bazz,
+                        created: this.created
+                    }
+                }
+            };
+
+            let sql = Foo.getAll(null, 4, 15, true);
+            assert.strictEqual(sql, "select * from `foo` limit 45,15");
+        })
     });
 });
