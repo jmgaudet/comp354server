@@ -133,6 +133,7 @@ describe('Model', function() {
 
             sql = foo.delete(null, true);
             assert.strictEqual(sql, "delete from `foo` where `id` = 0");
+
         });
 
         it('Should automatically instanciate all properties from a DB row', () => {

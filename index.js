@@ -3,6 +3,7 @@ const path = require('path');
 const express = require('express');
 const multer  = require('multer');
 const app = express();
+const mime = require('mime');
 const Response = require('./src/api/response');
 const ProductController = require('./src/controllers/productcontroller');
 
@@ -19,17 +20,21 @@ app.get('/', (req, res) => {
     res.send('Hello World!');
 });
 
+app.get('/categories', (req, res) => {
+    ProductController.getAllCategories(req, res);
+});
+
 /* Return all products by page
 route: /products?page=<page>&max=<max results>
  */
-app.get('/products', (req, res) => {
+app.get('/products/', (req, res) => {
     ProductController.getAllProducts(req, res);
 });
 
 /* Return a single product by id
 route: /products/<product id>
  */
-app.get('/products/:id', (req, res) => {
+app.get('/products/:id/', (req, res) => {
     ProductController.getProduct(req, res);
 });
 
@@ -53,7 +58,7 @@ function getProductImageStorage() {
         destination: path.join(publicDirectory, 'products'),
         filename: function (req, file, cb) {
             crypto.pseudoRandomBytes(16, function (err, raw) {
-                cb(null, raw.toString('hex') + Date.now() + '.' + mime.extension(file.mimetype));
+                cb(null, raw.toString('hex') + Date.now() + '.' + mime.getExtension(file.mimetype));
             });
         }
     });
@@ -64,7 +69,7 @@ function getProfileImageStorage() {
         destination: path.join(publicDirectory, 'profiles'),
         filename: function (req, file, cb) {
             crypto.pseudoRandomBytes(16, function (err, raw) {
-                cb(null, raw.toString('hex') + Date.now() + '.' + mime.extension(file.mimetype));
+                cb(null, raw.toString('hex') + Date.now() + '.' + mime.getExtension(file.mimetype));
             });
         }
     });

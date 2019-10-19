@@ -13,6 +13,44 @@ module.exports = class Product extends Model{
         return 'Products';
     }
 
+    static getAllSorted(callback, page = 1, max = 20, orderColumn = 'price', asc = true) {
+        const db = require('../db/database');
+
+        db.query("select count(*) as count from ??", [Product.getTable()], (err, results) => {
+            if(err) {
+                callback(err);
+            }
+            let count = results[0].count;
+            let pageCount = Math.ceil(count/max);
+
+            let query = `SELECT 
+                        p.*,
+                        c.name AS category,
+                        m.name AS manufacturer,
+                        i.url AS imageUrl
+                    FROM
+                        Products p
+                            LEFT JOIN
+                        ProductsCategories pc ON pc.productId = p.id
+                            LEFT JOIN
+                        Manufacturers m ON m.id = p.manufacturerId
+                            LEFT JOIN
+                        ProductsImages i ON i.productId = p.id
+                            LEFT JOIN
+                        Categories c ON c.id = pc.categoryId
+                    order by ?? ${asc ? 'ASC' : 'DESC'}`;
+            let params = [orderColumn];
+
+            db.query(query, params, (err, products) => {
+                if(err) {
+                    callback(err);
+                }
+                callback(null, products, pageCount);
+            });
+        });
+
+    }
+
     getImages(callback, dryRun = false) {
         let params = [ProductImage.getTable(), this.id];
         let query = 'select * from ?? where productId = ?';
@@ -64,6 +102,34 @@ module.exports = class Product extends Model{
         });
 
         return this.db.format(query, params);
+    }
+
+    getSummaryObject(callback) {
+        let _this = this;
+        let json = this.toJson();
+        this.getCategories((err, categories) => {
+            if(err) {
+                callback(err);
+            }
+            json.categories = [];
+            categories.forEach((category) => {
+                json.categories.push(category.toJson());
+            });
+            _this.getManufacturer((err, manufacturer) => {
+                if(err) {
+                    callback(err);
+                }
+                json.manufacturerName = manufacturer.name;
+                _this.getImages((err, images) => {
+                    if(err) {
+                        callback(err);
+                    }
+                    json.imageUrl = images[0].url;
+
+                    callback(null, json);
+                });
+            })
+        });
     }
 
     getCompleteObject(callback) {
