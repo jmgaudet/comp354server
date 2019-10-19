@@ -20,20 +20,26 @@ app.get('/', (req, res) => {
     res.send('Hello World!');
 });
 
-app.get('/categories', (req, res) => {
+app.get('/categories/', (req, res) => {
     ProductController.getAllCategories(req, res);
 });
 
-/* Return all products by page
-route: /products?page=<page>&max=<max results>
- */
+app.get('/categories/:id/', (req, res) => {
+    ProductController.getCategory(req, res);
+});
+
+app.get('/manufacturers/', (req, res) => {
+    ProductController.getAllManufacturers(req, res);
+});
+
+app.get('/manufacturers/:id/', (req, res) => {
+    ProductController.getManufacturer(req, res);
+});
+
 app.get('/products/', (req, res) => {
     ProductController.getAllProducts(req, res);
 });
 
-/* Return a single product by id
-route: /products/<product id>
- */
 app.get('/products/:id/', (req, res) => {
     ProductController.getProduct(req, res);
 });
@@ -43,7 +49,7 @@ route: /products
 post fields:
 -
  */
-app.post('/products', productImageUploads.any(), (req, res) => {
+app.post('/products/', productImageUploads.any(), (req, res) => {
 
 });
 

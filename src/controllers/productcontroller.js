@@ -1,5 +1,6 @@
 const Product = require('../models/product');
 const Category = require('../models/category');
+const Manufacturer = require('../models/manufacturer');
 const Response = require('../api/response');
 
 /**
@@ -68,17 +69,82 @@ module.exports = class ProductController {
         }
     }
 
+    /**
+     * Get list of categories
+     * @param req
+     * @param res
+     */
     static getAllCategories(req, res) {
         try {
+            let page = req.query.page && req.query.page > 0 ? parseInt(req.query.page) : 1;
+            let max = req.query.max && req.query.max > 0 ? parseInt(req.query.max) : 10;
+
             Category.getAll((err, categories) => {
                 if(err) {
                     res.send(Response.makeResponse(false, err.toString()));
                     return;
                 }
 
-                res.send(Response.makeResponse(true, 'Got all categories', categories));
-            });
+                res.send(Response.makeResponse(true, `Got page ${page}`, categories));
+            }, page, max);
         } catch(e) {
+            res.send(Response.makeResponse(false, e.toString()));
+        }
+    }
+
+    /**
+     * Return a single category by id
+     * @param req
+     * @param res
+     */
+    static getCategory(req, res) {
+        try {
+            let id = req.params.id;
+
+            Category.fromId(id, (err, category) => {
+                if(err) {
+                    res.send(Response.makeResponse(false, err.toString()));
+                    return;
+                }
+
+                res.send(Response.makeResponse(true, `Got category`, category));
+            });
+        }catch (e) {
+            res.send(Response.makeResponse(false, e.toString()));
+        }
+    }
+
+    static getAllManufacturers(req, res) {
+        try {
+            let page = req.query.page && req.query.page > 0 ? parseInt(req.query.page) : 1;
+            let max = req.query.max && req.query.max > 0 ? parseInt(req.query.max) : 10;
+
+            Manufacturer.getAll((err, categories) => {
+                if(err) {
+                    res.send(Response.makeResponse(false, err.toString()));
+                    return;
+                }
+
+                res.send(Response.makeResponse(true, `Got page ${page}`, categories));
+            }, page, max);
+        } catch(e) {
+            res.send(Response.makeResponse(false, e.toString()));
+        }
+    }
+
+    static getManufacturer(req, res) {
+        try {
+            let id = req.params.id;
+
+            Manufacturer.fromId(id, (err, category) => {
+                if(err) {
+                    res.send(Response.makeResponse(false, err.toString()));
+                    return;
+                }
+
+                res.send(Response.makeResponse(true, `Got manufacturer`, category));
+            });
+        }catch (e) {
             res.send(Response.makeResponse(false, e.toString()));
         }
     }
