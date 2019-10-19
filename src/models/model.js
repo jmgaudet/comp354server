@@ -73,6 +73,37 @@ module.exports = class Model {
     }
 
     /**
+     * Get all of the objects of this type by page
+     * @param callback
+     * @param page
+     * @param resultsPerPage
+     * @param dryRun
+     * @returns {string}
+     */
+    static getAll(callback, page = 1, resultsPerPage = 20, dryRun = false) {
+        const db = require('../db/database');
+
+        let start = (page - 1) * resultsPerPage;
+        const query = 'select * from ?? limit ?,?';
+        const params = [this.getTable(), start, resultsPerPage];
+
+        if(!dryRun) db.query(query, params, (err, res) => {
+            if(err) {
+                callback(err,null);
+            } else {
+                let r = [];
+                res.forEach((obj) => {
+                    let model = new this(obj);
+                    r.push(model);
+                });
+                callback(null, r);
+            }
+        });
+
+        return db.format(query, params);
+    }
+
+    /**
      * Deletes the current instance of this object from the database
      * @param callback - Function to be called on execution
      * @param dryRun - If true, will not actually execute, only return a statement

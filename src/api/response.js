@@ -1,7 +1,7 @@
 
 module.exports = class Response {
 
-    static makeResponse(isSuccess = false, message = '', payload) {
+    static makeResponse(isSuccess = false, message = '', payload, pages = 1) {
         let response = {};
         response.is_success = isSuccess;
         response.message = message;
@@ -13,6 +13,8 @@ module.exports = class Response {
         } else {
             response.contents = [];
         }
+
+        response.pages = pages;
 
         return JSON.stringify(response);
     }
