@@ -99,9 +99,9 @@ function getBaseUrl(req) {
 }
 
 function getProfileImageUrl(baseUrl, filename) {
-    return url.resolve(url.resolve(baseUrl, 'profiles'), filename);
+    return url.resolve(baseUrl, `/profiles/${filename}`);
 }
 
 function getProductImageUrl(baseUrl, filename) {
-    return url.resolve(url.resolve(baseUrl, 'profiles'), filename);
+    return url.resolve(baseUrl, `/products/${filename}`);
 }
