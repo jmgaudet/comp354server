@@ -50,7 +50,7 @@ app.delete('/products/:id/', (req, res) => {
 });
 
 app.post('/products/', productImageUploads.any(), (req, res) => {
-    console.log(productImageUploads.files);
+    console.log(req.files);
 });
 
 
