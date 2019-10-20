@@ -73,6 +73,36 @@ module.exports = class Model {
     }
 
     /**
+     * Asynchronously retrieves an object of this type from the
+     * database by Email
+     * @param email - The primary key of object to retrieve
+     * @param callback - Function to be called on execution
+     * @param dryRun - If true, will not actually execute, only return a statement
+     * @returns {string} - The prepared SQL statement
+     */
+    static fromEmail(email, callback, dryRun = false) {
+        const db = require('../db/database');
+
+        const query = 'select * from ?? where `email` = ?';
+        const params = [this.getTable(), email];
+
+        if(!dryRun) db.query(query, params, (err, res) => {
+            if(err) {
+                callback(err,null);
+            } else {
+                if(res[0]) {
+                    let model = new this(res[0]);
+                    callback(null, model);
+                } else {
+                    callback("Item not found");
+                }
+            }
+        });
+
+        return db.format(query, params);
+    }
+
+    /**
      * Get all of the objects of this type by page
      * @param callback
      * @param page

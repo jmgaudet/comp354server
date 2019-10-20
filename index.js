@@ -7,7 +7,7 @@ const mime = require('mime');
 const Response = require('./src/api/response');
 const ProductController = require('./src/controllers/productcontroller');
 const UserController = require('./src/controllers/usercontroller');
-
+app.use(express.json());
 
 const publicDirectory = path.join(__dirname, 'public');
 const productImageUploads = multer({storage: getProductImageStorage()});
@@ -55,6 +55,7 @@ post fields:
  */
 app.post('/products/', productImageUploads.any(), (req, res) => {
 
+
 });
 
 /*~~~~~~~~~~~~ User routes ~~~~~~~~~~~~*/
@@ -70,6 +71,12 @@ app.get('/users/:id/', (req, res) => {
 // app.post('/users/', (req, res) => {
 //
 // });
+
+//check user is authorized
+app.post('/login', (req, res) => {
+
+    UserController.userAuth(req,res);
+});
 
 
 /*================== End Routes =====================*/
