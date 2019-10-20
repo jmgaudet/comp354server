@@ -6,6 +6,40 @@ module.exports = class User extends Model {
         super(dbRow);
     }
 
+    static getTable() {
+        return 'Users';
+    }
 
+    static getAll(callback) {
+        const db = require('../db/database');
+
+        db.query('SELECT * FROM Users', [User.getTable()], (err, results) => {
+            if (err) {
+                callback(err);
+            }
+            callback(null, results);
+        })
+    }
+
+    static fromID(callback) {
+        const db = require('../db/database');
+
+
+    }
+
+
+
+    toJson() {
+        return {
+            id: this.id,
+            username: this.username,
+            password: this.password,
+            firstName: this.firstName,
+            lastName: this.lastName,
+            address: this.address,
+            email: this.email,
+            created: this.created,
+        }
+    }
 
 };

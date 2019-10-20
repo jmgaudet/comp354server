@@ -6,6 +6,8 @@ const app = express();
 const mime = require('mime');
 const Response = require('./src/api/response');
 const ProductController = require('./src/controllers/productcontroller');
+const UserController = require('./src/controllers/usercontroller');
+
 
 const publicDirectory = path.join(__dirname, 'public');
 const productImageUploads = multer({storage: getProductImageStorage()});
@@ -15,6 +17,8 @@ const port = process.env.PORT || 3030;
 app.use(express.static(publicDirectory));
 
 /*================== Add your routes here =====================*/
+
+/*~~~~~~~~~~~~ Product routes ~~~~~~~~~~~~*/
 
 app.get('/', (req, res) => {
     res.send('Hello World!');
@@ -52,6 +56,16 @@ post fields:
 app.post('/products/', productImageUploads.any(), (req, res) => {
 
 });
+
+/*~~~~~~~~~~~~ User routes ~~~~~~~~~~~~*/
+
+app.get('/users/', (req, res) => {
+    UserController.getAllUsers(req, res);
+});
+
+// app.post('/users/', (req, res) => {
+//
+// });
 
 
 /*================== End Routes =====================*/
