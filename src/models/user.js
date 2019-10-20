@@ -22,8 +22,7 @@ module.exports = class User extends Model {
     }
 
     getCompleteObject(callback) {
-        let _this = this;
-        let json = this.toJson();
+        let json;
         json = this.toJson();
         callback(null, json);
     }

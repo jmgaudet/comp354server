@@ -6,7 +6,7 @@ module.exports = class UserController {
     static getAllUsers(req, res) {
         try {
             User.getAll((err, users) => {
-                if (err) { res.send(Response.makeResponse(false, e.toString())); }
+                if (err) { res.send(Response.makeResponse(false, err.toString())); }
 
                 res.send(Response.makeResponse(true, 'Got users', users));
             })
