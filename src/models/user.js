@@ -21,10 +21,11 @@ module.exports = class User extends Model {
         })
     }
 
-    static fromID(callback) {
-        const db = require('../db/database');
-
-
+    getCompleteObject(callback) {
+        let _this = this;
+        let json = this.toJson();
+        json = this.toJson();
+        callback(null, json);
     }
 
 

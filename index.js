@@ -63,6 +63,10 @@ app.get('/users/', (req, res) => {
     UserController.getAllUsers(req, res);
 });
 
+app.get('/users/:id/', (req, res) => {
+    UserController.getUser(req, res);
+});
+
 // app.post('/users/', (req, res) => {
 //
 // });

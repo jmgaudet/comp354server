@@ -16,12 +16,25 @@ module.exports = class UserController {
     }
 
     static getUser(req, res) {
+        let id = req.params.id;
         try {
-            User.fromId((err, user) => {
-                if (err) { res.send(Response.makeResponse(false, e.toString())); }
+            User.fromId(id, (err, user) => {
+                if (err) {
+                    res.send(Response.makeResponse(false, err.toString()));
+                    return;
+                }
 
-                res.send(Response.makeResponse(true, 'Got user', user))
-            })
+                let success = !!user;
+                let message = success ? 'User found' : 'User not found';
+
+                if(success) {
+                    user.getCompleteObject((err, json) => {
+                        res.send(Response.makeResponse(success, message, json));
+                    });
+                } else {
+                    res.send(Response.makeResponse(success, message));
+                }
+            });
         } catch (e) {
             res.send(Response.makeResponse(false, e.toString()));
         }
