@@ -16,6 +16,14 @@ const profileImageUploads = multer({storage: getProfileImageStorage()});
 const port = process.env.PORT || 3030;
 app.use(express.static(publicDirectory));
 
+app.use((req, res, next) => {
+    res.append('Access-Control-Allow-Origin', ['*']);
+    res.append('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+    res.append('Access-Control-Allow-Headers', 'Content-Type');
+    res.setHeader('Content-Type', 'application/json');
+    next();
+});
+
 /*================== Add your routes here =====================*/
 
 app.get('/', (req, res) => {
@@ -51,7 +59,11 @@ app.delete('/products/:id/', (req, res) => {
 });
 
 app.post('/products/', productImageUploads.any(), (req, res) => {
-    console.log(req.files);
+    let imageUrls = [];
+    req.files.forEach((file) => {
+        imageUrls.push(getProductImageUrl(getBaseUrl(req), file.filename));
+    });
+    ProductController.addNewProduct(req, res, imageUrls);
 });
 
 
