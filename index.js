@@ -3,6 +3,8 @@ const path = require('path');
 const express = require('express');
 const multer  = require('multer');
 const app = express();
+const Response  = require('./src/api/response');
+
 
 const publicDirectory = path.join(__dirname, 'public');
 const productImageUploads = multer({storage: getProductImageStorage()});
@@ -14,8 +16,10 @@ app.use(express.static(publicDirectory));
 /*-------------- Add your routes here --------------*/
 
 app.get('/', (req, res) => {
-    res.send('Hello World!');
+    res.send(Response.makeResponse(true, 'blah'));
 });
+
+
 
 /* -----------------Config Stuff------------------- */
 app.listen(port, () => console.log(`Server listening on port ${port}!`));
