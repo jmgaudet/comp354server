@@ -1,5 +1,6 @@
 require('dotenv').config();
 const path = require('path');
+const url = require('url');
 const crypto = require('crypto');
 const express = require('express');
 const multer  = require('multer');
@@ -79,4 +80,16 @@ function getProfileImageStorage() {
             });
         }
     });
+}
+
+function getBaseUrl(req) {
+    return req.protocol + '://' + req.get('host');
+}
+
+function getProfileImageUrl(baseUrl, filename) {
+    return url.resolve(url.resolve(baseUrl, 'profiles'), filename);
+}
+
+function getProductImageUrl(baseUrl, filename) {
+    return url.resolve(url.resolve(baseUrl, 'profiles'), filename);
 }
