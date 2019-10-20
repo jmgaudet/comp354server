@@ -143,11 +143,41 @@ module.exports = class Model {
             if(err) {
                 callback(err);
             } else {
-                callback(null, results);
+                let id = results.insertId;
+                this.constructor.fromId(id, (err, m) => {
+                    if(err) {
+                        callback(err);
+                    } else {
+                        callback(null, m);
+                    }
+                });
             }
         });
 
         return this.db.format(query, params);
+    }
+
+    static search(key, value, callback, page = 1, max = 20, sort = key, asc = true, strict = false) {
+        const db = require('../db/database');
+
+        let start = (page - 1) * max;
+        let ascdesc = asc ? 'asc' : 'dec';
+        let v = strict ? value : `%${value}%`;
+        let query = `select * from ?? where ?? COLLATE utf8mb4_general_ci like ? order by ?? ${ascdesc} limit ?,?`;
+        let params = [this.getTable(), key, v, key, start, max];
+
+        db.query(query, params, (err, results) => {
+            if(err) {
+                callback(err);
+            } else {
+                let r = [];
+                results.forEach((obj) => {
+                    let model = new this(obj);
+                    r.push(model);
+                });
+                callback(null, r);
+            }
+        });
     }
 
     /**

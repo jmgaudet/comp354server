@@ -164,6 +164,43 @@ module.exports = class Product extends Model{
         });
     }
 
+    addCategory(categoryId, callback) {
+        let query = "insert into ProductsCategories set productId = ?, categoryId = ?";
+        let params = [this.id, categoryId];
+
+        this.db.query(query, params, (err,results) => {
+            if(err) {
+                callback(err);
+            } else {
+                callback(null, true);
+            }
+        });
+    }
+
+    /**
+     * Add multiple images to this product
+     * @param imageUrls
+     * @param callback
+     */
+    addImages(imageUrls, callback) {
+        let query = "insert into ProductsImages (productId, url) values ";
+        let params = [];
+        let placeholders = [];
+        imageUrls.forEach((url) => {
+            placeholders.push('(?,?)');
+            params.push(this.id);
+            params.push(url);
+        });
+        query += placeholders.join(',');
+        this.db.query(query, params, (err, results) => {
+            if(err) {
+                callback(err);
+            } else {
+                callback(null, true);
+            }
+        })
+    }
+
     toJson() {
         return {
             id: this.id,
