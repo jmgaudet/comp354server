@@ -8,6 +8,8 @@ const app = express();
 const mime = require('mime');
 const Response = require('./src/api/response');
 const ProductController = require('./src/controllers/productcontroller');
+const UserController = require('./src/controllers/usercontroller');
+app.use(express.json());
 
 const publicDirectory = path.join(__dirname, 'public');
 const productImageUploads = multer({storage: getProductImageStorage()});
@@ -25,6 +27,8 @@ app.use((req, res, next) => {
 });
 
 /*================== Add your routes here =====================*/
+
+/*~~~~~~~~~~~~ Product routes ~~~~~~~~~~~~*/
 
 app.get('/', (req, res) => {
     res.send('Hello World!');
@@ -64,6 +68,33 @@ app.post('/products/', productImageUploads.any(), (req, res) => {
         imageUrls.push(getProductImageUrl(getBaseUrl(req), file.filename));
     });
     ProductController.addNewProduct(req, res, imageUrls);
+});
+
+/*~~~~~~~~~~~~ User routes ~~~~~~~~~~~~*/
+
+app.get('/users/', (req, res) => {
+    UserController.getAllUsers(req, res);
+});
+
+app.get('/users/:id/', (req, res) => {
+    UserController.getUser(req, res);
+});
+
+app.post('/users/', profileImageUploads.any(), (req, res) => {
+    let profilePicUrls = [];
+    req.files.forEach((file) => {
+        profilePicUrls.push(getProfileImageUrl(getBaseUrl(req), file.filename));
+    });
+    UserController.addNewUser(req, res, profilePicUrls)
+});
+
+app.delete('/users/:id/', (req, res) => {
+    UserController.deleteUser(req, res)
+});
+
+//check if user is authorized
+app.post('/login/', (req, res) => {
+    UserController.userAuth(req,res);
 });
 
 
