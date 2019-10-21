@@ -41,7 +41,7 @@ module.exports = class UserController {
     }
 
 
-    static createUser(req, res) {
+    static addNewUser(req, res, profilePicUrls) {
         try {
             let user = new User();
             user.password = req.body.password;
@@ -49,32 +49,47 @@ module.exports = class UserController {
             user.lastName = req.body.lastName;
             user.primaryAddress = req.body.primaryAddress;
             user.alternateAddress = req.body.alternateAddress;
-            // let imageUrl = profileImageUploads;
+            user.addImages(profilePicUrls);
             user.email = req.body.email;
 
-
-            User.generate(user,(err, createdUser) => {
+            user.save((err, generated) => {
                 if (err) {
                     res.send(Response.makeResponse(false, err.toString()));
                     return;
                 }
 
-                let success = !!createdUser;
+                let success = !!generated;
                 let message = success ? 'User created' : 'User not created';
 
-                if (success) {
-                    let json = createdUser.getCompleteObject();
-                    res.send(Response.makeResponse(success, message, json));
-                    createdUser.
+                res.send(Response.makeResponse(success, message, generated));
 
-                    // createdUser.getCompleteObject((err, json) => {
-                    //     res.send(Response.makeResponse(success, message, json));
-                    // });
-                } else {
-                    res.send(Response.makeResponse(success, message));
-                }
             });
+        } catch (e) {
+            res.send(Response.makeResponse(false, e.toString()));
+        }
+    }
 
+    static deleteUser(req, res) {
+        try {
+            let id = req.params.id;
+            User.fromId(id, (err, user) => {
+                if (err) {
+                    res.send(Response.makeResponse(false, err.toString()));
+                    return;
+                }
+
+                user.delete((err, deletedUser) => {
+                    if (err) {
+                        res.send(Response.makeResponse(false, err.toString()));
+                        return;
+                    }
+
+                    let success = !!deletedUser;
+                    let message = success ? 'User deleted' : 'User not deleted';
+
+                    res.send(Response.makeResponse(success, message));
+                })
+            });
         } catch (e) {
             res.send(Response.makeResponse(false, e.toString()));
         }

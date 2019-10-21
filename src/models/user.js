@@ -21,30 +21,33 @@ module.exports = class User extends Model {
         });
     }
 
-    static generate(newUser, callback) {
-        const db = require('../db/database');
-
-        let query = `INSERT INTO Users(password, firstName, lastName, primaryAddress, alternateAddress, imageUrl, email, created) 
-                    VALUES ('${newUser.password}', '${newUser.firstName}', '${newUser.lastName}', '${newUser.primaryAddress}', 
-                    '${newUser.alternateAddress}', 'blank', '${newUser.email}', current_timestamp);`;
-        let params = [this.getTable()];
-
-        db.query(query, params, (err, generated) => {
-            if (err) {
-                callback(err);
-            }
-            callback(null, generated);
+    /**
+     * Add multiple images to this product
+     * @param profilePicUrls
+     * @param callback
+     */
+    addImages(profilePicUrls, callback) {
+        let query = 'INSERT INTO ProductsImages (productId, url) VALUES ';
+        let params = [];
+        let placeholders = [];
+        profilePicUrls.forEach((url) => {
+            placeholders.push('(?,?)');
+            params.push(this.id);
+            params.push(url);
         });
+        query += placeholders.join(',');
+        this.db.query(query, params, (err, results) => {
+            if(err) {
+                callback(err);
+            } else {
+                callback(null, true);
+            }
+        })
     }
 
     getCompleteObject() {
-        // let json;
-        // json = this.toJson();
-        // callback(null, json);
         return this.toJson();
     }
-
-
 
     toJson() {
         return {

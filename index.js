@@ -55,7 +55,6 @@ post fields:
  */
 app.post('/products/', productImageUploads.any(), (req, res) => {
 
-
 });
 
 /*~~~~~~~~~~~~ User routes ~~~~~~~~~~~~*/
@@ -69,7 +68,15 @@ app.get('/users/:id/', (req, res) => {
 });
 
 app.post('/users/', profileImageUploads.any(), (req, res) => {
-    UserController.createUser(req, res)
+    let profilePicUrls = [];
+    req.files.forEach((file) => {
+        profilePicUrls.push(getProfileImageUrl(getBaseUrl(req), file.filename));
+    });
+    UserController.addNewUser(req, res, profilePicUrls)
+});
+
+app.delete('/users/:id/', (req, res) => {
+    UserController.deleteUser(req, res)
 });
 
 //check if user is authorized
@@ -103,4 +110,16 @@ function getProfileImageStorage() {
             });
         }
     });
+}
+
+function getBaseUrl(req) {
+    return req.protocol + '://' + req.get('host');
+}
+
+function getProfileImageUrl(baseUrl, filename) {
+    return url.resolve(baseUrl, `/profiles/${filename}`);
+}
+
+function getProductImageUrl(baseUrl, filename) {
+    return url.resolve(baseUrl, `/products/${filename}`);
 }
