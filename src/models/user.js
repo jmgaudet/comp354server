@@ -18,13 +18,30 @@ module.exports = class User extends Model {
                 callback(err);
             }
             callback(null, results);
-        })
+        });
     }
 
-    getCompleteObject(callback) {
-        let json;
-        json = this.toJson();
-        callback(null, json);
+    static generate(newUser, callback) {
+        const db = require('../db/database');
+
+        let query = `INSERT INTO Users(password, firstName, lastName, primaryAddress, alternateAddress, imageUrl, email, created) 
+                    VALUES ('${newUser.password}', '${newUser.firstName}', '${newUser.lastName}', '${newUser.primaryAddress}', 
+                    '${newUser.alternateAddress}', 'blank', '${newUser.email}', current_timestamp);`;
+        let params = [this.getTable()];
+
+        db.query(query, params, (err, generated) => {
+            if (err) {
+                callback(err);
+            }
+            callback(null, generated);
+        });
+    }
+
+    getCompleteObject() {
+        // let json;
+        // json = this.toJson();
+        // callback(null, json);
+        return this.toJson();
     }
 
 
@@ -32,11 +49,12 @@ module.exports = class User extends Model {
     toJson() {
         return {
             id: this.id,
-            username: this.username,
             password: this.password,
             firstName: this.firstName,
             lastName: this.lastName,
-            address: this.address,
+            primaryAddress: this.primaryAddress,
+            alternateAddress: this.alternateAddress,
+            imageUrl: this.imageUrl,
             email: this.email,
             created: this.created,
         }

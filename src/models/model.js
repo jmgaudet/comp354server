@@ -94,7 +94,7 @@ module.exports = class Model {
                     let model = new this(res[0]);
                     callback(null, model);
                 } else {
-                    callback("Item not found");
+                    callback("User not found");
                 }
             }
         });

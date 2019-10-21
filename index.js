@@ -68,13 +68,12 @@ app.get('/users/:id/', (req, res) => {
     UserController.getUser(req, res);
 });
 
-// app.post('/users/', (req, res) => {
-//
-// });
+app.post('/users/', profileImageUploads.any(), (req, res) => {
+    UserController.createUser(req, res)
+});
 
-//check user is authorized
-app.post('/login', (req, res) => {
-
+//check if user is authorized
+app.post('/login/', (req, res) => {
     UserController.userAuth(req,res);
 });
 
