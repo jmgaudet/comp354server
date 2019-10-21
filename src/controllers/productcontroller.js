@@ -148,4 +148,115 @@ module.exports = class ProductController {
             res.send(Response.makeResponse(false, e.toString()));
         }
     }
+
+    /**
+     * Delete specific product
+     * @param req
+     * @param res
+     */
+    static deleteProduct(req, res) {
+        try{
+            let id = req.params.id;
+            Product.fromId(id, (err, product) => {
+                if(err) {
+                    res.send(Response.makeResponse(false, err.toString()));
+                    return;
+                }
+                product.delete((err, success) => {
+                    if(err) {
+                        res.send(Response.makeResponse(false, err.toString()));
+                        return;
+                    }
+                    let message = success ? 'Product deleted' : 'Product not deleted';
+
+                    res.send(Response.makeResponse(success, message));
+                    }
+                )
+            });
+        }catch (e) {
+            res.send(Response.makeResponse(false, e.toString()));
+        }
+
+    }
+
+    static makeCategoryProductLink(req, res, categoryId, product) {
+        product.addCategory(categoryId, (err, success) => {
+            if(err) {
+                res.send(Response.makeResponse(false, err.toString()));
+            } else {
+                product.getCompleteObject((err, json) => {
+                    res.send(Response.makeResponse(true, 'New product added', json));
+                });
+            }
+        });
+    }
+
+    static saveProductForManufacturerId(req, res, manufacturerId, product, imageUrls) {
+        product.manufacturerId = manufacturerId;
+        product.save((err, p) => {
+            if(err) {
+                res.send(Response.makeResponse(false, err.toString()));
+            } else {
+                p.addImages(imageUrls, (err, success) => {
+                    if(err) {
+                        res.send(Response.makeResponse(false, err.toString()));
+                    } else {
+                        Category.search('name', req.body.category, (err, cats) => {
+                            if(err) {
+                                res.send(Response.makeResponse(false, err.toString()));
+                            } else {
+                                if(cats.length > 0) {
+                                    this.makeCategoryProductLink(req, res, cats[0].id, p);
+                                } else {
+                                    let category = new Category();
+                                    category.name = req.body.category;
+                                    category.save((err, c) => {
+                                        if(err) {
+                                            res.send(Response.makeResponse(false, err.toString()));
+                                        } else {
+                                            this.makeCategoryProductLink(req, res, c.id, p);
+                                        }
+                                    });
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    }
+
+    static addNewProduct(req, res, imageUrls) {
+        try {
+            let product = new Product();
+            product.name = req.body.name;
+            product.price = parseFloat(req.body.price);
+            product.quantity = parseInt(req.body.quantity);
+            product.sellerId = parseInt(req.body.sellerId);
+            product.description = req.body.description;
+
+            Manufacturer.search('name', req.body.manufacturer, (err, mans) => {
+                if(err) {
+                    res.send(Response.makeResponse(false, err.toString()));
+                } else {
+                    if(mans.length > 0) {
+                        this.saveProductForManufacturerId(req, res, mans[0].id, product, imageUrls);
+                    } else {
+                        let manufacturer = new Manufacturer();
+                        manufacturer.name = req.body.manufacturer;
+                        manufacturer.save((err, m) => {
+                            if(err) {
+                                res.send(Response.makeResponse(false, err.toString()));
+                            } else {
+                                this.saveProductForManufacturerId(req, res, m.id, product, imageUrls);
+                            }
+                        });
+                    }
+                }
+            });
+
+        } catch(e) {
+            res.send(Response.makeResponse(false, e.toString()));
+        }
+    }
 };

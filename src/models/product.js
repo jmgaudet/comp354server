@@ -28,7 +28,7 @@ module.exports = class Product extends Model{
                         p.*,
                         c.name AS category,
                         m.name AS manufacturer,
-                        i.url AS imageUrl
+                        json_arrayagg(i.url)     AS images
                     FROM
                         Products p
                             LEFT JOIN
@@ -39,6 +39,7 @@ module.exports = class Product extends Model{
                         ProductsImages i ON i.productId = p.id
                             LEFT JOIN
                         Categories c ON c.id = pc.categoryId
+                        group by p.id, c.name
                     order by ?? ${asc ? 'ASC' : 'DESC'} limit ?,?`;
             let params = [orderColumn, start, max];
 
@@ -46,6 +47,9 @@ module.exports = class Product extends Model{
                 if(err) {
                     callback(err);
                 }
+                products.forEach((prod) => {
+                    prod.images = JSON.parse(prod.images);
+                });
                 callback(null, products, pageCount);
             });
         });
@@ -162,6 +166,43 @@ module.exports = class Product extends Model{
                 });
             })
         });
+    }
+
+    addCategory(categoryId, callback) {
+        let query = "insert into ProductsCategories set productId = ?, categoryId = ?";
+        let params = [this.id, categoryId];
+
+        this.db.query(query, params, (err,results) => {
+            if(err) {
+                callback(err);
+            } else {
+                callback(null, true);
+            }
+        });
+    }
+
+    /**
+     * Add multiple images to this product
+     * @param imageUrls
+     * @param callback
+     */
+    addImages(imageUrls, callback) {
+        let query = "insert into ProductsImages (productId, url) values ";
+        let params = [];
+        let placeholders = [];
+        imageUrls.forEach((url) => {
+            placeholders.push('(?,?)');
+            params.push(this.id);
+            params.push(url);
+        });
+        query += placeholders.join(',');
+        this.db.query(query, params, (err, results) => {
+            if(err) {
+                callback(err);
+            } else {
+                callback(null, true);
+            }
+        })
     }
 
     toJson() {

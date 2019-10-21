@@ -1,5 +1,7 @@
 require('dotenv').config();
 const path = require('path');
+const url = require('url');
+const crypto = require('crypto');
 const express = require('express');
 const multer  = require('multer');
 const app = express();
@@ -15,6 +17,14 @@ const profileImageUploads = multer({storage: getProfileImageStorage()});
 
 const port = process.env.PORT || 3030;
 app.use(express.static(publicDirectory));
+
+app.use((req, res, next) => {
+    res.append('Access-Control-Allow-Origin', ['*']);
+    res.append('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+    res.append('Access-Control-Allow-Headers', 'Content-Type');
+    res.setHeader('Content-Type', 'application/json');
+    next();
+});
 
 /*================== Add your routes here =====================*/
 
@@ -48,13 +58,43 @@ app.get('/products/:id/', (req, res) => {
     ProductController.getProduct(req, res);
 });
 
-/* Add a new product
-route: /products
-post fields:
--
- */
-app.post('/products/', productImageUploads.any(), (req, res) => {
+app.delete('/products/:id/', (req, res) => {
+    ProductController.deleteProduct(req, res);
+});
 
+app.post('/products/', productImageUploads.any(), (req, res) => {
+    let imageUrls = [];
+    req.files.forEach((file) => {
+        imageUrls.push(getProductImageUrl(getBaseUrl(req), file.filename));
+    });
+    ProductController.addNewProduct(req, res, imageUrls);
+});
+
+/*~~~~~~~~~~~~ User routes ~~~~~~~~~~~~*/
+
+app.get('/users/', (req, res) => {
+    UserController.getAllUsers(req, res);
+});
+
+app.get('/users/:id/', (req, res) => {
+    UserController.getUser(req, res);
+});
+
+app.post('/users/', profileImageUploads.any(), (req, res) => {
+    let profilePicUrls = [];
+    req.files.forEach((file) => {
+        profilePicUrls.push(getProfileImageUrl(getBaseUrl(req), file.filename));
+    });
+    UserController.addNewUser(req, res, profilePicUrls)
+});
+
+app.delete('/users/:id/', (req, res) => {
+    UserController.deleteUser(req, res)
+});
+
+//check if user is authorized
+app.post('/login/', (req, res) => {
+    UserController.userAuth(req,res);
 });
 
 /*~~~~~~~~~~~~ User routes ~~~~~~~~~~~~*/
