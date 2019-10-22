@@ -21,21 +21,11 @@ module.exports = class User extends Model {
         });
     }
 
-    /**
-     * Add multiple images to this product
-     * @param profilePicUrls
-     * @param callback
-     */
-    addImages(profilePicUrls, callback) {
-        let query = 'INSERT INTO ProductsImages (productId, url) VALUES ';
+    addProfilePic(profilePicUrl, callback) {
+        let query = 'INSERT INTO Users (id, imageUrl) VALUES ';
         let params = [];
-        let placeholders = [];
-        profilePicUrls.forEach((url) => {
-            placeholders.push('(?,?)');
-            params.push(this.id);
-            params.push(url);
-        });
-        query += placeholders.join(',');
+        params.push(this.id);
+        params.push(profilePicUrl);
         this.db.query(query, params, (err, results) => {
             if(err) {
                 callback(err);
@@ -43,10 +33,6 @@ module.exports = class User extends Model {
                 callback(null, true);
             }
         })
-    }
-
-    getCompleteObject() {
-        return this.toJson();
     }
 
     toJson() {

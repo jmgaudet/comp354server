@@ -46,24 +46,17 @@ module.exports = class UserController {
             user.lastName = req.body.lastName;
             user.primaryAddress = req.body.primaryAddress;
             user.alternateAddress = req.body.alternateAddress;
+            user.imageUrl = profilePicUrls;
             user.email = req.body.email;
-            user.addImages(profilePicUrls, (err, success) => {
+
+            user.save((err, generated) => {
                 if (err) {
                     res.send(Response.makeResponse(false, err.toString()));
                     return;
                 }
-                user.save((err, generated) => {
-                    if (err) {
-                        res.send(Response.makeResponse(false, err.toString()));
-                        return;
-                    }
-
-                    let success = !!generated;
-                    let message = success ? 'User created' : 'User not created';
-
-                    res.send(Response.makeResponse(success, message, generated));
-
-                });
+                let success = !!generated;
+                let message = success ? 'User created' : 'User not created';
+                res.send(Response.makeResponse(success, message, generated));
             });
         } catch (e) {
             res.send(Response.makeResponse(false, e.toString()));
@@ -78,16 +71,13 @@ module.exports = class UserController {
                     res.send(Response.makeResponse(false, err.toString()));
                     return;
                 }
-
                 user.delete((err, deletedUser) => {
                     if (err) {
                         res.send(Response.makeResponse(false, err.toString()));
                         return;
                     }
-
                     let success = !!deletedUser;
                     let message = success ? 'User deleted' : 'User not deleted';
-
                     res.send(Response.makeResponse(success, message));
                 })
             });

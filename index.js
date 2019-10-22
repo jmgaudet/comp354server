@@ -86,7 +86,7 @@ app.post('/users/', profileImageUploads.any(), (req, res) => {
     req.files.forEach((file) => {
         profilePicUrls.push(getProfileImageUrl(getBaseUrl(req), file.filename));
     });
-    UserController.addNewUser(req, res, profilePicUrls);
+    UserController.addNewUser(req, res, profilePicUrls[0]);     // Only the first photo is passed
 });
 
 app.delete('/users/:id/', (req, res) => {
