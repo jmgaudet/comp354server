@@ -70,32 +70,6 @@ app.post('/products/', productImageUploads.any(), (req, res) => {
     ProductController.addNewProduct(req, res, imageUrls);
 });
 
-/*~~~~~~~~~~~~ User routes ~~~~~~~~~~~~*/
-
-app.get('/users/', (req, res) => {
-    UserController.getAllUsers(req, res);
-});
-
-app.get('/users/:id/', (req, res) => {
-    UserController.getUser(req, res);
-});
-
-app.post('/users/', profileImageUploads.any(), (req, res) => {
-    let profilePicUrls = [];
-    req.files.forEach((file) => {
-        profilePicUrls.push(getProfileImageUrl(getBaseUrl(req), file.filename));
-    });
-    UserController.addNewUser(req, res, profilePicUrls)
-});
-
-app.delete('/users/:id/', (req, res) => {
-    UserController.deleteUser(req, res)
-});
-
-//check if user is authorized
-app.post('/login/', (req, res) => {
-    UserController.userAuth(req,res);
-});
 
 /*~~~~~~~~~~~~ User routes ~~~~~~~~~~~~*/
 
@@ -112,7 +86,7 @@ app.post('/users/', profileImageUploads.any(), (req, res) => {
     req.files.forEach((file) => {
         profilePicUrls.push(getProfileImageUrl(getBaseUrl(req), file.filename));
     });
-    UserController.addNewUser(req, res, profilePicUrls)
+    UserController.addNewUser(req, res, profilePicUrls);
 });
 
 app.delete('/users/:id/', (req, res) => {
