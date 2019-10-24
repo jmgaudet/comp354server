@@ -6,6 +6,7 @@ const express = require('express');
 const multer  = require('multer');
 const app = express();
 const mime = require('mime');
+const Joi = require('@hapi/joi');
 const Response = require('./src/api/response');
 const ProductController = require('./src/controllers/productcontroller');
 const UserController = require('./src/controllers/usercontroller');
@@ -88,6 +89,8 @@ app.post('/users/', profileImageUploads.any(), (req, res) => {
     });
     UserController.addNewUser(req, res, profilePicUrls[0]);     // Only the first photo is passed
 });
+
+app.post('/')
 
 app.delete('/users/:id/', (req, res) => {
     UserController.deleteUser(req, res)

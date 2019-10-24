@@ -21,19 +21,19 @@ module.exports = class User extends Model {
         });
     }
 
-    addProfilePic(profilePicUrl, callback) {
-        let query = 'INSERT INTO Users (id, imageUrl) VALUES ';
-        let params = [];
-        params.push(this.id);
-        params.push(profilePicUrl);
-        this.db.query(query, params, (err, results) => {
-            if(err) {
-                callback(err);
-            } else {
-                callback(null, true);
-            }
-        })
-    }
+    // addProfilePic(profilePicUrl, callback) {
+    //     let query = 'INSERT INTO Users (id, imageUrl) VALUES ';
+    //     let params = [];
+    //     params.push(this.id);
+    //     params.push(profilePicUrl);
+    //     this.db.query(query, params, (err, results) => {
+    //         if(err) {
+    //             callback(err);
+    //         } else {
+    //             callback(null, true);
+    //         }
+    //     })
+    // }
 
     toJson() {
         return {

@@ -1,12 +1,17 @@
 const User = require('../models/user');
+const ShoppingCart = require('../models/shoppingcart');
 const Response = require('../api/response');
+const Joi = require('@hapi/joi');
 
 module.exports = class UserController {
 
     static getAllUsers(req, res) {
         try {
             User.getAll((err, users) => {
-                if (err) { res.send(Response.makeResponse(false, err.toString())); }
+                if (err) {
+                    res.send(Response.makeResponse(false, err.toString()));
+                    return;
+                }
 
                 res.send(Response.makeResponse(true, 'Got users', users));
             })
@@ -37,9 +42,30 @@ module.exports = class UserController {
         }
     }
 
-
     static addNewUser(req, res, profilePicUrls) {
         try {
+            const schema = Joi.object({
+                password: Joi.string().pattern(/^[a-zA-Z0-9]{8,30}$/),
+                repeat_pass: Joi.ref('pass'),
+                firstName: Joi.string().min(2).required(),
+                lastName: Joi.string().min(2).required(),
+                primaryAddress: Joi.string().required(),
+                alternateAddress: Joi.string(),
+                email: Joi.string().email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } })
+            });
+
+            const { error, valid } = schema.validate({ password: req.body.password,
+                                                        firstName: req.body.firstName,
+                                                        lastName: req.body.lastName,
+                                                        primaryAddress: req.body.primaryAddress,
+                                                        alternateAddress: req.body.alternateAddress,
+                                                        email: req.body.email });
+
+            if (error != null) {
+                res.status(400).send(Response.makeResponse(false, error.details[0].message));
+                return;
+            }
+
             let user = new User();
             user.password = req.body.password;
             user.firstName = req.body.firstName;
@@ -58,6 +84,14 @@ module.exports = class UserController {
                 let message = success ? 'User created' : 'User not created';
                 res.send(Response.makeResponse(success, message, generated));
             });
+        } catch (e) {
+            res.send(Response.makeResponse(false, e.toString()));
+        }
+    }
+
+    static updateUser(req, res) {
+        try {
+
         } catch (e) {
             res.send(Response.makeResponse(false, e.toString()));
         }
