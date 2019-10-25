@@ -82,25 +82,25 @@ app.get('/users/:id/', (req, res) => {
     UserController.getUser(req, res);
 });
 
-app.post('/users/', profileImageUploads.any(), (req, res) => {
-    let profilePicUrls = [];
-    req.files.forEach((file) => {
-        profilePicUrls.push(getProfileImageUrl(getBaseUrl(req), file.filename));
-    });
-    UserController.addNewUser(req, res, profilePicUrls[0]);     // Only the first photo is passed
+app.get('/users/cart/:id', (req, res) => {
+    console.log('inside index')
+
+    UserController.getUserCart(req, res);
 });
 
-app.post('/')
-
 app.delete('/users/:id/', (req, res) => {
-    UserController.deleteUser(req, res)
+    UserController.deleteUser(req, res);
+});
+
+app.post('/users/', profileImageUploads.any(), (req, res) => {
+    let profilePicUrl = getProfileImageUrl(getBaseUrl(req), req.files[0].filename);     // Only taking the first file
+    UserController.addNewUser(req, res, profilePicUrl);
 });
 
 //check if user is authorized
 app.post('/login/', (req, res) => {
     UserController.userAuth(req,res);
 });
-
 
 
 

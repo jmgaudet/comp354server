@@ -54,12 +54,14 @@ module.exports = class UserController {
                 email: Joi.string().email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } })
             });
 
-            const { error, valid } = schema.validate({ password: req.body.password,
-                                                        firstName: req.body.firstName,
-                                                        lastName: req.body.lastName,
-                                                        primaryAddress: req.body.primaryAddress,
-                                                        alternateAddress: req.body.alternateAddress,
-                                                        email: req.body.email });
+            const { error, valid } = schema.validate({
+                password: req.body.password,
+                firstName: req.body.firstName,
+                lastName: req.body.lastName,
+                primaryAddress: req.body.primaryAddress,
+                alternateAddress: req.body.alternateAddress,
+                email: req.body.email
+            });
 
             if (error != null) {
                 res.status(400).send(Response.makeResponse(false, error.details[0].message));
@@ -89,10 +91,28 @@ module.exports = class UserController {
         }
     }
 
-    static updateUser(req, res) {
+    static getUserCart(req, res) {
         try {
+            let id = req.params.id;
+            User.getCartItems(id, (err, items) => {
+                if (err) {
+                    res.send(Response.makeResponse(false, err.toString()));
+                    return;
+                }
 
+                let found = !!items;
+                let message = found ? 'Got shopping cart items' : 'No items in cart';
+
+                if (found) {
+                    console.log('inside if in getUserCart');
+                    res.send(Response.makeResponse(found, message, items));
+                }
+                else
+                    res.send(Response.makeResponse(found, message));
+            })
         } catch (e) {
+            console.log('inside catch block in getUserCart')
+
             res.send(Response.makeResponse(false, e.toString()));
         }
     }

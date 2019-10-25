@@ -1,4 +1,5 @@
 const Model = require('./model.js');
+const ShoppingCart = require('./shoppingcart.js');
 
 module.exports = class User extends Model {
 
@@ -10,30 +11,25 @@ module.exports = class User extends Model {
         return 'Users';
     }
 
-    static getAll(callback) {
+    static getCartItems(id, callback, dryrun=false) {
         const db = require('../db/database');
 
-        db.query('SELECT * FROM Users', [User.getTable()], (err, results) => {
+        let params = [ShoppingCart.getTable(), id];
+        const query = 'select * from ?? where `userId` = ?';
+
+        if (!dryrun) db.query(query, params, (err, results) => {
             if (err) {
                 callback(err);
+            } else {
+                // let r = [];
+                // results.forEach((row) => {
+                //     r.push(new ShoppingCart(row));
+                // });
+                callback(null, results);
             }
-            callback(null, results);
         });
+        return db.format(query, params);
     }
-
-    // addProfilePic(profilePicUrl, callback) {
-    //     let query = 'INSERT INTO Users (id, imageUrl) VALUES ';
-    //     let params = [];
-    //     params.push(this.id);
-    //     params.push(profilePicUrl);
-    //     this.db.query(query, params, (err, results) => {
-    //         if(err) {
-    //             callback(err);
-    //         } else {
-    //             callback(null, true);
-    //         }
-    //     })
-    // }
 
     toJson() {
         return {

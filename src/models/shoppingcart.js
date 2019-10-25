@@ -7,14 +7,15 @@ module.exports = class User extends Model {
     }
 
     static getTable() {
-        return 'ShoppingCart';
+        return "ShoppingCart";
     }
 
     toJson() {
         return {
             id: this.id,
             userId: this.userId,
-            productId: this.productId
+            productId: this.productId,
+            created: this.created
         }
     }
 
