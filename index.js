@@ -6,6 +6,7 @@ const express = require('express');
 const multer  = require('multer');
 const app = express();
 const mime = require('mime');
+const Joi = require('@hapi/joi');
 const Response = require('./src/api/response');
 const ProductController = require('./src/controllers/productcontroller');
 const UserController = require('./src/controllers/usercontroller');
@@ -70,6 +71,7 @@ app.post('/products/', productImageUploads.any(), (req, res) => {
     ProductController.addNewProduct(req, res, imageUrls);
 });
 
+
 /*~~~~~~~~~~~~ User routes ~~~~~~~~~~~~*/
 
 app.get('/users/', (req, res) => {
@@ -80,22 +82,27 @@ app.get('/users/:id/', (req, res) => {
     UserController.getUser(req, res);
 });
 
-app.post('/users/', profileImageUploads.any(), (req, res) => {
-    let profilePicUrls = [];
-    req.files.forEach((file) => {
-        profilePicUrls.push(getProfileImageUrl(getBaseUrl(req), file.filename));
-    });
-    UserController.addNewUser(req, res, profilePicUrls)
+app.get('/users/cart/:id', (req, res) => {
+    console.log('inside index')
+
+    UserController.getUserCart(req, res);
 });
 
 app.delete('/users/:id/', (req, res) => {
-    UserController.deleteUser(req, res)
+    UserController.deleteUser(req, res);
+});
+
+app.post('/users/', profileImageUploads.any(), (req, res) => {
+    let profilePicUrl = getProfileImageUrl(getBaseUrl(req), req.files[0].filename);     // Only taking the first file
+    UserController.addNewUser(req, res, profilePicUrl);
 });
 
 //check if user is authorized
 app.post('/login/', (req, res) => {
     UserController.userAuth(req,res);
 });
+
+
 
 
 /*================== End Routes =====================*/

@@ -58,7 +58,6 @@ module.exports = class Product extends Model{
         });
 
     }
-
     getImages(callback, dryRun = false) {
         let params = [ProductImage.getTable(), this.id];
         let query = 'select * from ?? where productId = ?';

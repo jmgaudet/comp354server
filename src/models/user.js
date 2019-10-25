@@ -1,4 +1,5 @@
 const Model = require('./model.js');
+const ShoppingCart = require('./shoppingcart.js');
 
 module.exports = class User extends Model {
 
@@ -10,43 +11,24 @@ module.exports = class User extends Model {
         return 'Users';
     }
 
-    static getAll(callback) {
+    static getCartItems(id, callback, dryrun=false) {
         const db = require('../db/database');
 
-        db.query('SELECT * FROM Users', [User.getTable()], (err, results) => {
+        let params = [ShoppingCart.getTable(), id];
+        const query = 'select * from ?? where `userId` = ?';
+
+        if (!dryrun) db.query(query, params, (err, results) => {
             if (err) {
                 callback(err);
-            }
-            callback(null, results);
-        });
-    }
-
-    /**
-     * Add multiple images to this product
-     * @param profilePicUrls
-     * @param callback
-     */
-    addImages(profilePicUrls, callback) {
-        let query = 'INSERT INTO ProductsImages (productId, url) VALUES ';
-        let params = [];
-        let placeholders = [];
-        profilePicUrls.forEach((url) => {
-            placeholders.push('(?,?)');
-            params.push(this.id);
-            params.push(url);
-        });
-        query += placeholders.join(',');
-        this.db.query(query, params, (err, results) => {
-            if(err) {
-                callback(err);
             } else {
-                callback(null, true);
+                // let r = [];
+                // results.forEach((row) => {
+                //     r.push(new ShoppingCart(row));
+                // });
+                callback(null, results);
             }
-        })
-    }
-
-    getCompleteObject() {
-        return this.toJson();
+        });
+        return db.format(query, params);
     }
 
     toJson() {
