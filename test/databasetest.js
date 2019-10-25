@@ -4,6 +4,7 @@ const Database = require('../src/db/database');
 describe('Database', function() {
     describe('query', function() {
         it('should return one result with value 2', function(done) {
+            //this comment is for an example only
             Database.query('select 1 + 1 as col', null, (err, results) => {
                 if(err) {
                     done(err);

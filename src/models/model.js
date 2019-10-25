@@ -191,7 +191,7 @@ module.exports = class Model {
         const db = require('../db/database');
 
         let start = (page - 1) * max;
-        let ascdesc = asc ? 'asc' : 'dec';
+        let ascdesc = asc ? 'asc' : 'desc';
         let v = strict ? value : `%${value}%`;
         let query = `select * from ?? where ?? COLLATE utf8mb4_general_ci like ? order by ?? ${ascdesc} limit ?,?`;
         let params = [this.getTable(), key, v, key, start, max];

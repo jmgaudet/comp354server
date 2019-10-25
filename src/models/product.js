@@ -13,7 +13,7 @@ module.exports = class Product extends Model{
         return 'Products';
     }
 
-    static getAllSorted(callback, page = 1, max = 20, orderColumn = 'price', asc = true) {
+    static getAllSorted(callback, search = '', page = 1, max = 20, orderColumn = 'price', asc = true) {
         const db = require('../db/database');
 
         db.query("select count(*) as count from ??", [Product.getTable()], (err, results) => {
@@ -39,9 +39,12 @@ module.exports = class Product extends Model{
                         ProductsImages i ON i.productId = p.id
                             LEFT JOIN
                         Categories c ON c.id = pc.categoryId
+                        where p.name COLLATE utf8mb4_general_ci like ? or
+                        c.name COLLATE utf8mb4_general_ci like ? or
+                        m.name COLLATE utf8mb4_general_ci like ?
                         group by p.id, c.name
                     order by ?? ${asc ? 'ASC' : 'DESC'} limit ?,?`;
-            let params = [orderColumn, start, max];
+            let params = [`%${search}%`, `%${search}%`, `%${search}%`, orderColumn, start, max];
 
             db.query(query, params, (err, products) => {
                 if(err) {
