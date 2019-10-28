@@ -70,7 +70,6 @@ app.post('/products/', productImageUploads.any(), (req, res) => {
     ProductController.addNewProduct(req, res, imageUrls);
 });
 
-
 /*~~~~~~~~~~~~ User routes ~~~~~~~~~~~~*/
 
 app.get('/cart/:id', (req, res) => {
@@ -112,6 +111,9 @@ app.post('/login/', (req, res) => {
     UserController.userAuth(req, res);
 });
 
+app.get('/rating/:id/', (req, res) => {
+    UserController.getRating(req, res);
+});
 
 /*================== End Routes =====================*/
 
