@@ -185,7 +185,7 @@ module.exports = class UserController {
                             return;
                         }
                         let success = !!item;
-                        let message = item ? `Item with productId ${productId} and quantity ${quantity} added to cart` : 'Item could not be added to cart';
+                        let message = item ? `Item with productId #${productId} and quantity ${quantity} added to cart` : 'Item could not be added to cart';
                         //  TODO: Update the added product's quantity count
 
                         res.send(Response.makeResponse(success, message));
@@ -201,11 +201,11 @@ module.exports = class UserController {
         }
     }
 
-    // TODO: When an item is deleted, don't delete the entire row, only the requested quantity.
     static deleteFromCart(req, res) {
         try {
             let userId = req.params.userId;
             let productId = req.params.productId;
+            let quantity = req.params.quantity;
 
             ShoppingCart.itemFromId(userId, productId, (err, item) => {
                 if (err) {
@@ -214,17 +214,33 @@ module.exports = class UserController {
                 }
                 let found = !!item;
                 if (found) {
-                    item.delete((err, removedItem) => {
-                        if (err) {
-                            res.send(Response.makeResponse(false, err.toString()));
-                            return;
-                        }
-                        let success = !!removedItem;
-                        let message = success ? 'Item removed from cart' : 'Item was not removed from cart';
-                        res.send(Response.makeResponse(success, message));
-                    })
+                    if (quantity < item.quantity) {
+                        item.quantity = parseInt(item.quantity) - parseInt(quantity);
+                        item.save((err, updatedItem) => {
+                            if (err) {
+                                res.send(Response.makeResponse(false, err.toString()));
+                                return;
+                            }
+                            let success = !!updatedItem;
+                            let message = updatedItem ? `Item with productId #${productId} and quantity ${quantity} was removed from the cart` :
+                                'Item could not be removed from cart';
+
+                            res.send(Response.makeResponse(success, message));
+                        }, true);
+                    }
+                    else {
+                        item.delete((err, removedItem) => {
+                            if (err) {
+                                res.send(Response.makeResponse(false, err.toString()));
+                                return;
+                            }
+                            let success = !!removedItem;
+                            let message = success ? 'Item removed from cart' : 'Item was not removed from cart';
+                            res.send(Response.makeResponse(success, message));
+                        });
+                    }
                 } else {
-                    let message = `Item with productId ${productId} was not located in shopping cart`;
+                    let message = `Item with productId #${productId} was not located in shopping cart`;
                     res.send(Response.makeResponse(false, message));
                     return;
                 }

@@ -161,7 +161,6 @@ module.exports = class Model {
      * @returns {string} - The prepared SQL statement
      */
     save(callback, update = false, druRun = false) {
-        console.log("inside model/save")
         const json = this.toJson();
         delete json.created;
         delete json.id;
@@ -177,7 +176,6 @@ module.exports = class Model {
                 let id = update ? this.id : results.insertId;
                 this.constructor.fromId(id, (err, m) => {
                     if (err) {
-                        console.log("inside model/save/constructor.fromID/ERROR")
                         callback(err);
                     } else {
                         callback(null, m);

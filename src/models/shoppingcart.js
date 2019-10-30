@@ -16,9 +16,7 @@ module.exports = class ShoppingCart extends Model {
     static itemFromId(userId, productId, callback, dryRun = false) {
         const db = require('../db/database');
 
-        console.log("in here")
         const query = 'select * from ?? where `userId` = ? and `productId` = ?';
-        // const query = "select * from ShoppingCart where userId = '1' and productId = '1'";
         const params = [this.getTable(), userId, productId];
 
         if (!dryRun) db.query(query, params, (err, res) => {
