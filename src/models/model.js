@@ -17,9 +17,9 @@
 module.exports = class Model {
 
     constructor(dbRow) {
-        if(dbRow) {
+        if (dbRow) {
             let _this = this;
-            Object.keys(dbRow).forEach(function(key) {
+            Object.keys(dbRow).forEach(function (key) {
                 _this[key] = dbRow[key];
             });
         } else {
@@ -56,11 +56,11 @@ module.exports = class Model {
         const query = 'select * from ?? where `id` = ?';
         const params = [this.getTable(), id];
 
-        if(!dryRun) db.query(query, params, (err, res) => {
-            if(err) {
-                callback(err,null);
+        if (!dryRun) db.query(query, params, (err, res) => {
+            if (err) {
+                callback(err, null);
             } else {
-                if(res[0]) {
+                if (res[0]) {
                     let model = new this(res[0]);
                     callback(null, model);
                 } else {
@@ -86,11 +86,11 @@ module.exports = class Model {
         const query = 'select * from ?? where `email` = ?';
         const params = [this.getTable(), email];
 
-        if(!dryRun) db.query(query, params, (err, res) => {
-            if(err) {
-                callback(err,null);
+        if (!dryRun) db.query(query, params, (err, res) => {
+            if (err) {
+                callback(err, null);
             } else {
-                if(res[0]) {
+                if (res[0]) {
                     let model = new this(res[0]);
                     callback(null, model);
                 } else {
@@ -117,9 +117,9 @@ module.exports = class Model {
         const query = 'select * from ?? limit ?,?';
         const params = [this.getTable(), start, resultsPerPage];
 
-        if(!dryRun) db.query(query, params, (err, res) => {
-            if(err) {
-                callback(err,null);
+        if (!dryRun) db.query(query, params, (err, res) => {
+            if (err) {
+                callback(err, null);
             } else {
                 let r = [];
                 res.forEach((obj) => {
@@ -142,8 +142,8 @@ module.exports = class Model {
         const query = 'delete from ?? where `id` = ?';
         let params = [this.constructor.getTable(), this.id];
 
-        if(!dryRun) this.db.query(query, params, (err, results) => {
-            if(err) {
+        if (!dryRun) this.db.query(query, params, (err, results) => {
+            if (err) {
                 callback(err);
             } else {
                 callback(null, true);
@@ -169,13 +169,13 @@ module.exports = class Model {
 
         const query = update ? 'update ?? set ? where `id` = ?' : 'insert ignore into ?? set ?';
 
-        if(!druRun) this.db.query(query, params, (err, results) => {
-            if(err) {
+        if (!druRun) this.db.query(query, params, (err, results) => {
+            if (err) {
                 callback(err);
             } else {
-                let id = results.insertId;
+                let id = update ? this.id : results.insertId;
                 this.constructor.fromId(id, (err, m) => {
-                    if(err) {
+                    if (err) {
                         callback(err);
                     } else {
                         callback(null, m);
@@ -197,7 +197,7 @@ module.exports = class Model {
         let params = [this.getTable(), key, v, key, start, max];
 
         db.query(query, params, (err, results) => {
-            if(err) {
+            if (err) {
                 callback(err);
             } else {
                 let r = [];
