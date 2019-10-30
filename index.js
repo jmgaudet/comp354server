@@ -3,10 +3,9 @@ const path = require('path');
 const url = require('url');
 const crypto = require('crypto');
 const express = require('express');
-const multer  = require('multer');
+const multer = require('multer');
 const app = express();
 const mime = require('mime');
-const Joi = require('@hapi/joi');
 const Response = require('./src/api/response');
 const ProductController = require('./src/controllers/productcontroller');
 const UserController = require('./src/controllers/usercontroller');
@@ -74,18 +73,24 @@ app.post('/products/', productImageUploads.any(), (req, res) => {
 
 /*~~~~~~~~~~~~ User routes ~~~~~~~~~~~~*/
 
+app.get('/cart/:id', (req, res) => {
+    UserController.getUserCart(req, res);
+});
+
+app.delete('/cart/:userId/:productId/:quantity', (req, res) => {
+    UserController.deleteFromCart(req, res);
+});
+
+app.post('/cart/:userId/:productId/:quantity', (req, res) => {
+    UserController.addToCart(req, res);
+});
+
 app.get('/users/', (req, res) => {
     UserController.getAllUsers(req, res);
 });
 
 app.get('/users/:id/', (req, res) => {
     UserController.getUser(req, res);
-});
-
-app.get('/users/cart/:id', (req, res) => {
-    console.log('inside index')
-
-    UserController.getUserCart(req, res);
 });
 
 app.delete('/users/:id/', (req, res) => {
@@ -97,12 +102,15 @@ app.post('/users/', profileImageUploads.any(), (req, res) => {
     UserController.addNewUser(req, res, profilePicUrl);
 });
 
-//check if user is authorized
-app.post('/login/', (req, res) => {
-    UserController.userAuth(req,res);
+app.post('/users/:id/', profileImageUploads.any(), (req, res) => {
+    let profilePicUrl = getProfileImageUrl(getBaseUrl(req), req.files[0].filename);
+    UserController.updateUser(req, res, profilePicUrl);
 });
 
-
+//check if user is authorized
+app.post('/login/', (req, res) => {
+    UserController.userAuth(req, res);
+});
 
 
 /*================== End Routes =====================*/
