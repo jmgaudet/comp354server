@@ -1,5 +1,4 @@
 const Model = require('./model.js');
-const ShoppingCart = require('./shoppingcart.js');
 const Validation = require('../api/validation');
 
 module.exports = class User extends Model {

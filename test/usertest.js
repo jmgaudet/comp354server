@@ -4,14 +4,14 @@ const User = require('../src/models/user');
 
 describe('User', () => {
 
-    let now = new Date;
+    let now = new Date();
 
     const mockUserResults = [
         {
             id: 3,
             firstName: 'Bob',
             lastName: 'Smith',
-            address: '123 Fake Street',
+            primaryAddress: '123 Fake Street',
             email: 'bob_smith@kmail.com',
             created: now
         }
@@ -24,13 +24,11 @@ describe('User', () => {
         assert.strictEqual(user.id, 3);
         assert.strictEqual(user.firstName, 'Bob');
         assert.strictEqual(user.lastName, 'Smith');
-        assert.strictEqual(user.address, '123 Fake Street');
+        assert.strictEqual(user.primaryAddress, '123 Fake Street');
         assert.strictEqual(user.email, 'bob_smith@kmail.com');
         assert.strictEqual(user.created, now)
 
     });
-
-
 
 
 });
