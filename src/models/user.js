@@ -19,13 +19,30 @@ module.exports = class User extends Model {
      */
     static authenticate(req, profilePicUrl, callback) {
 
-        // WARNING: Joi's validation return names are hard-coded.
-        //          Do not change the variable names "error" and "value".
-        const {error, value} = Validation.checkIfValid(req);
+        let doValidation = false;
 
-        if (error) {
-            callback(error);
-        } else {
+        if (doValidation) {
+            // WARNING: Joi's validation return names are hard-coded.
+            //          Do not change the variable names "error" and "value".
+            const {error, value} = Validation.checkIfValid(req);
+
+            if (error) {
+                callback(error);
+            } else {
+                let user = new User();
+
+                user.password = value.password;
+                user.firstName = value.firstName.charAt(0).toUpperCase() + value.firstName.slice(1);
+                user.lastName = value.lastName.charAt(0).toUpperCase() + value.lastName.slice(1);
+                user.primaryAddress = value.primaryAddress;
+                user.alternateAddress = value.alternateAddress;
+                user.imageUrl = profilePicUrl;
+                user.email = value.email;
+                callback(null, user);
+            }
+        }
+
+        else {
             let user = new User();
             user.password = req.body.password;
             user.firstName = req.body.firstName;
@@ -37,7 +54,6 @@ module.exports = class User extends Model {
             callback(null, user);
         }
     }
-
 
 
     toJson() {
@@ -54,4 +70,5 @@ module.exports = class User extends Model {
         }
     }
 
-};
+}
+;
