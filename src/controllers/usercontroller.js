@@ -102,8 +102,8 @@ module.exports = class UserController {
 
     static getUserCart(req, res) {
         try {
-            let id = req.params.id;
-            ShoppingCart.getCartItems(id, (err, items) => {
+            let userId = req.params.id;
+            ShoppingCart.getCartItems(userId, (err, items) => {
                 if (err) {
                     res.send(Response.makeResponse(false, err.toString()));
                     return;
@@ -149,8 +149,8 @@ module.exports = class UserController {
         try {
             const Product = require('../models/product');   // Not sure if this is the best way... But I need to get a Product's quantity
             let userId = req.params.userId;
-            let productId = req.params.productId;
-            let quantity = req.params.quantity;
+            let productId = req.body.productId;
+            let quantity = req.body.quantity;
 
             // Check if the desired "quantity" is a viable amount
             Product.fromId(productId, (err, prod) => {
@@ -159,8 +159,8 @@ module.exports = class UserController {
                     return;
                 }
                 if (prod.quantity < quantity) {
-                    let message = 'The quantity you have asked for is greater than the product stock';
-                    res.send(Response.makeResponse(false, message));
+                    let message = `Check product "quantity": The quantity you have asked for is greater than the product stock: ${prod.quantity}`;
+                    res.send(Response.makeResponse(false, message, prod));
                     return;
                 }
                 let basket = new ShoppingCart();
@@ -186,16 +186,12 @@ module.exports = class UserController {
                         }
                         let success = !!item;
                         let message = item ? `Item with productId #${productId} and quantity ${quantity} added to cart` : 'Item could not be added to cart';
-                        //  TODO: Update the added product's quantity count
 
                         res.send(Response.makeResponse(success, message));
                     }, found);  // <-- If fromId() returned an existing item in this customer's cart, then update=True
-
-
                 });
-
-
             });
+
         } catch (e) {
             res.send(Response.makeResponse(false, e.toString()));
         }
@@ -204,8 +200,8 @@ module.exports = class UserController {
     static deleteFromCart(req, res) {
         try {
             let userId = req.params.userId;
-            let productId = req.params.productId;
-            let quantity = req.params.quantity;
+            let productId = req.body.productId;
+            let quantity = req.body.quantity;
 
             ShoppingCart.itemFromId(userId, productId, (err, item) => {
                 if (err) {
@@ -222,10 +218,10 @@ module.exports = class UserController {
                                 return;
                             }
                             let success = !!updatedItem;
-                            let message = updatedItem ? `Item with productId #${productId} and quantity ${quantity} was removed from the cart` :
+                            let message = updatedItem ? `Item with productId ${productId} and quantity ${quantity} was removed from the cart` :
                                 'Item could not be removed from cart';
 
-                            res.send(Response.makeResponse(success, message));
+                            res.send(Response.makeResponse(success, message, updatedItem));
                         }, true);
                     }
                     else {
@@ -235,12 +231,12 @@ module.exports = class UserController {
                                 return;
                             }
                             let success = !!removedItem;
-                            let message = success ? 'Item removed from cart' : 'Item was not removed from cart';
+                            let message = success ? `All items with productId ${productId} were removed from the cart` : 'Item was not removed from cart';
                             res.send(Response.makeResponse(success, message));
                         });
                     }
                 } else {
-                    let message = `Item with productId #${productId} was not located in shopping cart`;
+                    let message = `Item with productId ${productId} was not located in shopping cart`;
                     res.send(Response.makeResponse(false, message));
                     return;
                 }

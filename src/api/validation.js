@@ -5,10 +5,10 @@ module.exports = class Validation {
     static checkIfValid(req) {
 
         const schema = Joi.object().keys({
-            password: Joi.string().pattern(/^[a-zA-Z0-9]{8,30}$/).required(),
+            password: Joi.string().min(8).required(),
             repeat_password: Joi.ref('password'),
-            firstName: Joi.string().min(2).required(),
-            lastName: Joi.string().min(2).required(),
+            firstName: Joi.string().pattern(/^[A-zÀ-ú\-]{2,30}$/).required(),
+            lastName: Joi.string().pattern(/^[A-zÀ-ú\-]{2,30}$/).required(),
             primaryAddress: Joi.string().required(),
             alternateAddress: Joi.string(),
             email: Joi.string().email({minDomainSegments: 2, tlds: {allow: ['com', 'net']}})

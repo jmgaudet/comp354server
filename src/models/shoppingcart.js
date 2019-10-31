@@ -35,10 +35,10 @@ module.exports = class ShoppingCart extends Model {
         return db.format(query, params);
     }
 
-    static getCartItems(id, callback, dryrun = false) {
+    static getCartItems(userId, callback, dryrun = false) {
         const db = require('../db/database');
 
-        let params = [ShoppingCart.getTable(), id];
+        let params = [ShoppingCart.getTable(), userId];
         const query = 'select * from ?? where `userId` = ?';
 
         if (!dryrun) db.query(query, params, (err, results) => {

@@ -73,15 +73,15 @@ app.post('/products/', productImageUploads.any(), (req, res) => {
 
 /*~~~~~~~~~~~~ User routes ~~~~~~~~~~~~*/
 
-app.get('/cart/:id', (req, res) => {
+app.get('/cart/:userId', (req, res) => {
     UserController.getUserCart(req, res);
 });
 
-app.delete('/cart/:userId/:productId/:quantity', (req, res) => {
+app.delete('/cart/:userId/', (req, res) => {
     UserController.deleteFromCart(req, res);
 });
 
-app.post('/cart/:userId/:productId/:quantity', (req, res) => {
+app.post('/cart/:userId/', (req, res) => {
     UserController.addToCart(req, res);
 });
 
