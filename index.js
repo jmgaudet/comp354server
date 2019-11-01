@@ -116,14 +116,11 @@ app.get('/users/:id/ratings', (req, res) => {
     UserController.getRating(req, res);
 });
 
-<<<<<<< HEAD
-=======
 app.get('/ratings/:id/', (req, res) => {
     RatingController.getRating(req, res);
 });
 
 
->>>>>>> Fix the issue
 /*================== End Routes =====================*/
 
 /* -----------------Config Stuff------------------- */
