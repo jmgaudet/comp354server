@@ -10,7 +10,6 @@ const Response = require('./src/api/response');
 const ProductController = require('./src/controllers/productcontroller');
 const UserController = require('./src/controllers/usercontroller');
 app.use(express.json());
-
 const publicDirectory = path.join(__dirname, 'public');
 const productImageUploads = multer({storage: getProductImageStorage()});
 const profileImageUploads = multer({storage: getProfileImageStorage()});
@@ -110,6 +109,10 @@ app.post('/users/:id/', profileImageUploads.any(), (req, res) => {
 //check if user is authorized
 app.post('/login/', (req, res) => {
     UserController.userAuth(req, res);
+});
+
+app.post('/passwordreset/', (req, res) => {
+    UserController.passReset(req,res);
 });
 
 
