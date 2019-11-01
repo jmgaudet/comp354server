@@ -11,11 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-<<<<<<< HEAD
-    "@hapi/joi": "^16.1.7",
-=======
     "bcrypt": "^3.0.6",
->>>>>>> User password reset code is done, but testing in progress
     "dotenv": "^8.1.0",
     "express": "^4.17.1",
     "mime": "^2.4.4",
