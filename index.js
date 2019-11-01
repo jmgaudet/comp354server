@@ -103,7 +103,8 @@ app.post('/users/', profileImageUploads.any(), (req, res) => {
 });
 
 app.post('/users/:id/', profileImageUploads.any(), (req, res) => {
-    let profilePicUrl = getProfileImageUrl(getBaseUrl(req), req.files[0].filename);
+    // let profilePicUrl = getProfileImageUrl(getBaseUrl(req), req.files[0].filename);
+    let profilePicUrl = "";
     UserController.updateUser(req, res, profilePicUrl);
 });
 
