@@ -202,7 +202,7 @@ module.exports = class ProductController {
                     if(err) {
                         res.send(Response.makeResponse(false, err.toString()));
                     } else {
-                        Category.search('name', req.body.category, (err, cats) => {
+                        Category.search('name', req.body["category:"], (err, cats) => {
                             if(err) {
                                 res.send(Response.makeResponse(false, err.toString()));
                             } else {
@@ -210,7 +210,7 @@ module.exports = class ProductController {
                                     this.makeCategoryProductLink(req, res, cats[0].id, p);
                                 } else {
                                     let category = new Category();
-                                    category.name = req.body.category;
+                                    category.name = req.body["category:"];
                                     category.save((err, c) => {
                                         if(err) {
                                             res.send(Response.makeResponse(false, err.toString()));
@@ -230,13 +230,13 @@ module.exports = class ProductController {
     static addNewProduct(req, res, imageUrls) {
         try {
             let product = new Product();
-            product.name = req.body.name;
-            product.price = parseFloat(req.body.price);
-            product.quantity = parseInt(req.body.quantity);
-            product.sellerId = parseInt(req.body.sellerId);
-            product.description = req.body.description;
+            product.name = req.body["name:"];
+            product.price = parseFloat(req.body["price:"]);
+            product.quantity = parseInt(req.body["quantity:"]);
+            product.sellerId = parseInt(req.body["sellerId:"]);
+            product.description = req.body["description:"];
 
-            Manufacturer.search('name', req.body.manufacturer, (err, mans) => {
+            Manufacturer.search('name', req.body["manufacturer:"], (err, mans) => {
                 if(err) {
                     res.send(Response.makeResponse(false, err.toString()));
                 } else {
@@ -244,7 +244,7 @@ module.exports = class ProductController {
                         this.saveProductForManufacturerId(req, res, mans[0].id, product, imageUrls);
                     } else {
                         let manufacturer = new Manufacturer();
-                        manufacturer.name = req.body.manufacturer;
+                        manufacturer.name = req.body["manufacturer:"];
                         manufacturer.save((err, m) => {
                             if(err) {
                                 res.send(Response.makeResponse(false, err.toString()));
