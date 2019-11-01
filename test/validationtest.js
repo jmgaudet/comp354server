@@ -47,9 +47,9 @@ describe('Validation', () => {
 
     it('Should fail if firstName field is does not define a name', (done) => {   // Same with lastName
         mockSubmittedUserFields[0].body.repeat_password = 'password123';
-        mockSubmittedUserFields[0].body.firstName = 'B';
+        mockSubmittedUserFields[0].body.firstName = 'B0b';
         const {error, value} = Validation.checkIfValid(mockSubmittedUserFields[0]);
-        assert.strictEqual(error.message, `"firstName" with value "B" fails to match the required pattern: /^[A-zÀ-ú\\-]{2,30}$/`);
+        assert.strictEqual(error.message, `"firstName" with value "B0b" fails to match the required pattern: /^[A-zÀ-ú\\-]{2,30}$/`);
         done()
     });
 
