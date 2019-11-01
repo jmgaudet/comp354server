@@ -1,3 +1,5 @@
+
+
 require('dotenv').config();
 const User = require('../models/user');
 const ShoppingCart = require('../models/shoppingcart');
@@ -257,23 +259,30 @@ module.exports = class UserController {
     static userAuth(req, res) {
 
         let email = req.body.email;
-        let password = req.body.password;
+        let passwordNonHash = req.body.password;
+
+
         try {
             User.fromEmail(email, (err, user) => {
                 if (err) {
                     res.send(Response.makeResponse(false, err.toString()));
                     return;
                 }
+
+
                 let foundUser = user.toJson();
                 let success = !!user;
                 let message = success ? 'User Email Found' : 'User Email Not Found';
 
                 if (success) {
-                    if (foundUser.email === email && foundUser.password === password) {
-                        res.send(Response.makeResponse(true, 'User is Authorized', foundUser));
-                    } else {
-                        res.send(Response.makeResponse(false, 'User is Not Authorized'));
-                    }
+                    bcrypt.compare(passwordNonHash, foundUser.password, function(err, res1) {
+                        if (res1) {
+                            res.send(Response.makeResponse(true, 'User is Authorized', foundUser));
+                        } else {
+                            res.send(Response.makeResponse(false, 'User is Not Authorized'));
+                        }
+                    });
+
                 } else {
                     res.send(Response.makeResponse(success, message));
                 }
@@ -283,7 +292,16 @@ module.exports = class UserController {
             res.send(Response.makeResponse(false, e.toString()));
         }
 
-    }
+
+
+
+
+
+
+
+
+            }
+
 
     //Sends a new temporary password by email to a client who requests a forgot password
     static passReset(req, res) {
