@@ -167,7 +167,7 @@ module.exports = class UserController {
                 // Check if the User with given userId exists:
                 User.fromId(userId, (err, user) => {
                     if (err) {
-                        res.send(Response.makeResponse(false, `User with id ${userId} does not exist!`));
+                        res.send(Response.makeResponse(false,`User with id ${userId} does not exist!`));
                         return;
                     }
 

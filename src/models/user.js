@@ -44,13 +44,13 @@ module.exports = class User extends Model {
 
         else {
             let user = new User();
-            user.password = req.body.password;
-            user.firstName = req.body.firstName;
-            user.lastName = req.body.lastName;
-            user.primaryAddress = req.body.primaryAddress;
-            user.alternateAddress = req.body.alternateAddress;
+            user.password = req.body["password:"];
+            user.firstName = req.body["firstName:"];
+            user.lastName = req.body["lastName:"];
+            user.primaryAddress = req.body["primaryAddress:"];
+            user.alternateAddress = req.body["alternateAddress:"];
             user.imageUrl = profilePicUrl;
-            user.email = req.body.email;
+            user.email = req.body["email:"];
             callback(null, user);
         }
     }
