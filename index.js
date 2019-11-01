@@ -9,6 +9,7 @@ const mime = require('mime');
 const Response = require('./src/api/response');
 const ProductController = require('./src/controllers/productcontroller');
 const UserController = require('./src/controllers/usercontroller');
+const RatingController = require('./src/controllers/ratingcontroller');
 app.use(express.json());
 
 const publicDirectory = path.join(__dirname, 'public');
@@ -70,7 +71,6 @@ app.post('/products/', productImageUploads.any(), (req, res) => {
     ProductController.addNewProduct(req, res, imageUrls);
 });
 
-
 /*~~~~~~~~~~~~ User routes ~~~~~~~~~~~~*/
 
 app.get('/cart/:userId', (req, res) => {
@@ -112,7 +112,18 @@ app.post('/login/', profileImageUploads.none(), (req, res) => {
     UserController.userAuth(req, res);
 });
 
+app.get('/users/:id/ratings', (req, res) => {
+    UserController.getRating(req, res);
+});
 
+<<<<<<< HEAD
+=======
+app.get('/ratings/:id/', (req, res) => {
+    RatingController.getRating(req, res);
+});
+
+
+>>>>>>> Fix the issue
 /*================== End Routes =====================*/
 
 /* -----------------Config Stuff------------------- */
