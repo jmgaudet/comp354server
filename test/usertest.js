@@ -1,6 +1,5 @@
 const assert = require('assert');
 const User = require('../src/models/user');
-// const describe = require('mocha');
 
 describe('User', () => {
 
