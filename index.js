@@ -129,7 +129,7 @@ app.listen(port, () => console.log(`Server listening on port ${port}!`));
 
 function getProductImageStorage() {
     return multer.diskStorage({
-        destination: path.join(publicDirectory, 'products'),
+        destination: path.join(publicDirectory, 'product_images'),
         filename: function (req, file, cb) {
             crypto.pseudoRandomBytes(16, function (err, raw) {
                 cb(null, raw.toString('hex') + Date.now() + '.' + mime.getExtension(file.mimetype));
