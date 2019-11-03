@@ -9,6 +9,7 @@ const mime = require('mime');
 const Response = require('./src/api/response');
 const ProductController = require('./src/controllers/productcontroller');
 const UserController = require('./src/controllers/usercontroller');
+const CartController = require('./src/controllers/cartcontroller');
 app.use(express.json());
 
 const publicDirectory = path.join(__dirname, 'public');
@@ -73,18 +74,6 @@ app.post('/products/', productImageUploads.any(), (req, res) => {
 
 /*~~~~~~~~~~~~ User routes ~~~~~~~~~~~~*/
 
-app.get('/cart/:userId', (req, res) => {
-    UserController.getUserCart(req, res);
-});
-
-app.delete('/cart/:userId/', (req, res) => {
-    UserController.deleteFromCart(req, res);
-});
-
-app.post('/cart/:userId/', (req, res) => {
-    UserController.addToCart(req, res);
-});
-
 app.get('/users/', (req, res) => {
     UserController.getAllUsers(req, res);
 });
@@ -97,19 +86,45 @@ app.delete('/users/:id/', (req, res) => {
     UserController.deleteUser(req, res);
 });
 
+// Update: profile picture
+app.put('/users/update/profileImage/:id/', profileImageUploads.any(), (req, res) => {
+    let profilePicUrl = getProfileImageUrl(getBaseUrl(req), req.files[0].filename);
+    UserController.updateUserProfileImage(req, res, profilePicUrl);
+});
+
+// Update: firstName, lastName, primaryAddress, alternateAddress
+app.put('/users/update/details/:id/', (req, res) => {
+    UserController.updateUserDetails(req, res);
+});
+
+// Update: password
+app.put('/users/update/password/:id/', (req, res) => {
+    UserController.updateUserPassword(req, res,);
+});
+
 app.post('/users/', profileImageUploads.any(), (req, res) => {
     let profilePicUrl = getProfileImageUrl(getBaseUrl(req), req.files[0].filename);     // Only taking the first file
     UserController.addNewUser(req, res, profilePicUrl);
 });
 
-app.post('/users/:id/', profileImageUploads.any(), (req, res) => {
-    let profilePicUrl = getProfileImageUrl(getBaseUrl(req), req.files[0].filename);
-    UserController.updateUser(req, res, profilePicUrl);
-});
-
 //check if user is authorized
 app.post('/login/', profileImageUploads.none(), (req, res) => {
     UserController.userAuth(req, res);
+});
+
+
+/*~~~~~~~~~~~~ Cart routes ~~~~~~~~~~~~*/
+
+app.get('/cart/:userId', (req, res) => {
+    CartController.getUserCart(req, res);
+});
+
+app.delete('/cart/:userId/', (req, res) => {
+    CartController.deleteFromCart(req, res);
+});
+
+app.post('/cart/:userId/', (req, res) => {
+    CartController.addToCart(req, res);
 });
 
 
