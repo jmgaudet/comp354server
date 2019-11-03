@@ -158,5 +158,5 @@ function getProfileImageUrl(baseUrl, filename) {
 }
 
 function getProductImageUrl(baseUrl, filename) {
-    return url.resolve(baseUrl, `/products/${filename}`);
+    return url.resolve(baseUrl, `/product_images/${filename}`);
 }
