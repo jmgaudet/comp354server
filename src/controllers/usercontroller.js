@@ -1,5 +1,4 @@
 const User = require('../models/user');
-const ShoppingCart = require('../models/shoppingcart');
 const Response = require('../api/response');
 
 module.exports = class UserController {

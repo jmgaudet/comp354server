@@ -5,7 +5,7 @@ module.exports = class CartController {
 
     static getUserCart(req, res) {
         try {
-            let userId = req.params.userId;
+            let userId = req.params.id;
             ShoppingCart.getCartItems(userId, (err, items) => {
                 if (err) {
                     res.send(Response.makeResponse(false, err.toString()));
@@ -29,7 +29,7 @@ module.exports = class CartController {
         try {
             const Product = require('../models/product.js');
             const User = require('../models/user.js');
-            let userId = req.params.userId;
+            let userId = req.params.id;
             let productId = req.body.productId;
             let quantity = req.body.quantity;
 
@@ -89,7 +89,7 @@ module.exports = class CartController {
 
     static deleteFromCart(req, res) {
         try {
-            let userId = req.params.userId;
+            let userId = req.params.id;
             let productId = req.body.productId;
             let quantity = req.body.quantity;
 

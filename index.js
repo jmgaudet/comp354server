@@ -74,56 +74,57 @@ app.post('/products/', productImageUploads.any(), (req, res) => {
 
 /*~~~~~~~~~~~~ User routes ~~~~~~~~~~~~*/
 
-app.get('/users/', (req, res) => {
+app.get('/users', (req, res) => {
     UserController.getAllUsers(req, res);
 });
 
-app.get('/users/:id/', (req, res) => {
+app.get('/users/:id', (req, res) => {
     UserController.getUser(req, res);
 });
 
-app.delete('/users/:id/', (req, res) => {
+app.delete('/users/:id', (req, res) => {
     UserController.deleteUser(req, res);
 });
 
 // Update: profile picture
-app.put('/users/update/profileImage/:id/', profileImageUploads.any(), (req, res) => {
+app.put('/users/:id/profileImage', profileImageUploads.any(), (req, res) => {
     let profilePicUrl = getProfileImageUrl(getBaseUrl(req), req.files[0].filename);
     UserController.updateUserProfileImage(req, res, profilePicUrl);
 });
 
 // Update: firstName, lastName, primaryAddress, alternateAddress
-app.put('/users/update/details/:id/', (req, res) => {
+app.put('/users/:id/details', (req, res) => {
+// app.put('/users/update/details/:id', (req, res) => {
     UserController.updateUserDetails(req, res);
 });
 
 // Update: password
-app.put('/users/update/password/:id/', (req, res) => {
+app.put('/users/:id/password', (req, res) => {
     UserController.updateUserPassword(req, res,);
 });
 
-app.post('/users/', profileImageUploads.any(), (req, res) => {
+app.post('/users', profileImageUploads.any(), (req, res) => {
     let profilePicUrl = getProfileImageUrl(getBaseUrl(req), req.files[0].filename);     // Only taking the first file
     UserController.addNewUser(req, res, profilePicUrl);
 });
 
 //check if user is authorized
-app.post('/login/', profileImageUploads.none(), (req, res) => {
+app.post('/login', profileImageUploads.none(), (req, res) => {
     UserController.userAuth(req, res);
 });
 
 
 /*~~~~~~~~~~~~ Cart routes ~~~~~~~~~~~~*/
 
-app.get('/cart/:userId', (req, res) => {
+app.get('/users/:id/cart', (req, res) => {
     CartController.getUserCart(req, res);
 });
 
-app.delete('/cart/:userId/', (req, res) => {
+app.delete('/users/:id/cart', (req, res) => {
     CartController.deleteFromCart(req, res);
 });
 
-app.post('/cart/:userId/', (req, res) => {
+app.post('/users/:id/cart', (req, res) => {
     CartController.addToCart(req, res);
 });
 
