@@ -9,6 +9,7 @@ const mime = require('mime');
 const Response = require('./src/api/response');
 const ProductController = require('./src/controllers/productcontroller');
 const UserController = require('./src/controllers/usercontroller');
+const CartController = require('./src/controllers/cartcontroller');
 const RatingController = require('./src/controllers/ratingcontroller');
 app.use(express.json());
 
@@ -71,45 +72,45 @@ app.post('/products/', productImageUploads.any(), (req, res) => {
     ProductController.addNewProduct(req, res, imageUrls);
 });
 
+
 /*~~~~~~~~~~~~ User routes ~~~~~~~~~~~~*/
 
-app.get('/cart/:userId', (req, res) => {
-    UserController.getUserCart(req, res);
-});
-
-app.delete('/cart/:userId/', (req, res) => {
-    UserController.deleteFromCart(req, res);
-});
-
-app.post('/cart/:userId/', (req, res) => {
-    UserController.addToCart(req, res);
-});
-
-app.get('/users/', (req, res) => {
+app.get('/users', (req, res) => {
     UserController.getAllUsers(req, res);
 });
 
-app.get('/users/:id/', (req, res) => {
+app.get('/users/:id', (req, res) => {
     UserController.getUser(req, res);
 });
 
-app.delete('/users/:id/', (req, res) => {
+app.delete('/users/:id', (req, res) => {
     UserController.deleteUser(req, res);
 });
 
-app.post('/users/', profileImageUploads.any(), (req, res) => {
+// Update: profile picture
+app.put('/users/:id/profileImage', profileImageUploads.any(), (req, res) => {
+    let profilePicUrl = getProfileImageUrl(getBaseUrl(req), req.files[0].filename);
+    UserController.updateUserProfileImage(req, res, profilePicUrl);
+});
+
+// Update: firstName, lastName, primaryAddress, alternateAddress
+app.put('/users/:id/details', (req, res) => {
+// app.put('/users/update/details/:id', (req, res) => {
+    UserController.updateUserDetails(req, res);
+});
+
+// Update: password
+app.put('/users/:id/password', (req, res) => {
+    UserController.updateUserPassword(req, res,);
+});
+
+app.post('/users', profileImageUploads.any(), (req, res) => {
     let profilePicUrl = getProfileImageUrl(getBaseUrl(req), req.files[0].filename);     // Only taking the first file
     UserController.addNewUser(req, res, profilePicUrl);
 });
 
-app.post('/users/:id/', profileImageUploads.any(), (req, res) => {
-    // let profilePicUrl = getProfileImageUrl(getBaseUrl(req), req.files[0].filename);
-    let profilePicUrl = "";
-    UserController.updateUser(req, res, profilePicUrl);
-});
-
 //check if user is authorized
-app.post('/login/', profileImageUploads.none(), (req, res) => {
+app.post('/login', profileImageUploads.none(), (req, res) => {
     UserController.userAuth(req, res);
 });
 
@@ -119,6 +120,21 @@ app.get('/users/:id/ratings', (req, res) => {
 
 app.get('/ratings/:id/', (req, res) => {
     RatingController.getRating(req, res);
+});
+
+
+/*~~~~~~~~~~~~ Cart routes ~~~~~~~~~~~~*/
+
+app.get('/users/:id/cart', (req, res) => {
+    CartController.getUserCart(req, res);
+});
+
+app.delete('/users/:id/cart', (req, res) => {
+    CartController.deleteFromCart(req, res);
+});
+
+app.post('/users/:id/cart', (req, res) => {
+    CartController.addToCart(req, res);
 });
 
 
