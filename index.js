@@ -10,6 +10,7 @@ const Response = require('./src/api/response');
 const ProductController = require('./src/controllers/productcontroller');
 const UserController = require('./src/controllers/usercontroller');
 const CartController = require('./src/controllers/cartcontroller');
+const RatingController = require('./src/controllers/ratingcontroller');
 app.use(express.json());
 
 const publicDirectory = path.join(__dirname, 'public');
@@ -113,6 +114,14 @@ app.post('/login', profileImageUploads.none(), (req, res) => {
     UserController.userAuth(req, res);
 });
 
+app.get('/users/:id/ratings', (req, res) => {
+    UserController.getRating(req, res);
+});
+
+app.get('/ratings/:id/', (req, res) => {
+    RatingController.getRating(req, res);
+});
+
 
 /*~~~~~~~~~~~~ Cart routes ~~~~~~~~~~~~*/
 
@@ -136,7 +145,7 @@ app.listen(port, () => console.log(`Server listening on port ${port}!`));
 
 function getProductImageStorage() {
     return multer.diskStorage({
-        destination: path.join(publicDirectory, 'products'),
+        destination: path.join(publicDirectory, 'product_images'),
         filename: function (req, file, cb) {
             crypto.pseudoRandomBytes(16, function (err, raw) {
                 cb(null, raw.toString('hex') + Date.now() + '.' + mime.getExtension(file.mimetype));
@@ -165,5 +174,5 @@ function getProfileImageUrl(baseUrl, filename) {
 }
 
 function getProductImageUrl(baseUrl, filename) {
-    return url.resolve(baseUrl, `/products/${filename}`);
+    return url.resolve(baseUrl, `/product_images/${filename}`);
 }
