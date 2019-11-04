@@ -295,13 +295,11 @@ module.exports = class UserController {
                             res.send(Response.makeResponse(false, err.toString()));
                             return;
                         }
-
                         //Check email matches in the database
                         if(user.email === email) {
-
-                            //Create a new password from a set of symbols
+                            //Create a new 10 character password from a set of symbols
                             let newPassW = '';
-                            let listOfChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_*$%&#!';
+                            let listOfChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_*$%&#!.,[]{}();?<>';
                             let charactersLength = listOfChars.length;
                             for ( let i = 0; i < 10; i++ ) {
                                 newPassW = newPassW.concat(listOfChars.charAt(Math.floor(Math.random() * charactersLength)));
@@ -323,20 +321,18 @@ module.exports = class UserController {
                                             const transporter = nodemailer.createTransport(sparkPostTransport({
                                                 sparkPostApiKey: process.env.SPARKPOST_API_KEY
                                             }));
-
                                             //Create email to user with new temporary password
                                             let sendingNewPassWMail = {
-                                                from: 'no-reply@no-reply.354thestars.com',
-                                                to: user.email,
+                                                from: 'no-reply@allanpichardo.com',
+                                                to: '354testerlinda@gmail.com', //TODO: this is a temporary testing email account to receive the forgot password emails
+                                                //to: user.email,               //TODO: once users have actual associated emails, we could use this
                                                 subject: 'New Temporary Password for 354TheStars Website',
-                                                text: 'Hello,<br>Here is your new password:</br>' +
-                                                    user.password + '<br></br><br></br>' +
+                                                html: 'Hello,<br></br><br>Here is your new password: </br>' +
+                                                    newPassW + '<br></br><br></br>' +
                                                     'Please make sure to change it once you login with this password.<br></br><br></br>' +
                                                     'Thank you,<br></br><br></br>354TheStars Team'
-
                                             };
-
-                                            //Send created email user nodemailer's transporter
+                                            //Send created email to user via nodemailer's transporter
                                             transporter.sendMail(sendingNewPassWMail, function (err, info) {
                                                 if (err) {
                                                     res.send(Response.makeResponse(false, err.toString()));
@@ -356,6 +352,5 @@ module.exports = class UserController {
             res.send(Response.makeResponse(false, e.toString()));
         }
     }
-
 
 };
