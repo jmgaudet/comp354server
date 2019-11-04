@@ -258,10 +258,11 @@ module.exports = class UserController {
     //checks to see if user email and password are found and correct within the database.
     static userAuth(req, res) {
 
+        //grabs email and password from body
         let email = req.body.email;
         let passwordNonHash = req.body.password;
 
-
+        //looks up user info from email
         try {
             User.fromEmail(email, (err, user) => {
                 if (err) {
@@ -269,11 +270,13 @@ module.exports = class UserController {
                     return;
                 }
 
-
+                //if found then store all user info in foundUser
                 let foundUser = user.toJson();
                 let success = !!user;
                 let message = success ? 'User Email Found' : 'User Email Not Found';
 
+
+                //if found then compare the password entered to whats stored using bcrypt's compare method.
                 if (success) {
                     bcrypt.compare(passwordNonHash, foundUser.password, function(err, res1) {
                         if (res1) {
@@ -291,14 +294,6 @@ module.exports = class UserController {
         } catch (e) {
             res.send(Response.makeResponse(false, e.toString()));
         }
-
-
-
-
-
-
-
-
 
             }
 
