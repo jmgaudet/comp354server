@@ -2,7 +2,6 @@
 
 require('dotenv').config();
 const User = require('../models/user');
-const ShoppingCart = require('../models/shoppingcart');
 const Response = require('../api/response');
 const bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');
@@ -60,7 +59,7 @@ module.exports = class UserController {
 
     static addNewUser(req, res, profilePicUrl) {
         try {
-            User.authenticate(req, profilePicUrl, (err, validUser) => {
+            User.validateNewUser(req, profilePicUrl, (err, validUser) => {
                 if (err) {
                     res.send(Response.makeResponse(false, err.toString()));
                     return;
@@ -75,54 +74,92 @@ module.exports = class UserController {
                     res.send(Response.makeResponse(success, message, updated));
                 });
             });
-
         } catch (e) {
             res.send(Response.makeResponse(false, e.toString()));
         }
     }
 
-    static updateUser(req, res, profilePicUrl) {
+    static updateUserPassword(req, res) {
         try {
-            User.authenticate(req, profilePicUrl, (err, validUser) => {
+            User.validateNewPassword(req, (err, value) => {
                 if (err) {
                     res.send(Response.makeResponse(false, err.toString()));
                     return;
                 }
-                validUser.id = req.params.id;
-                validUser.save((err, updated) => {
+                User.fromId(req.params.id, (err, foundUser) => {
                     if (err) {
                         res.send(Response.makeResponse(false, err.toString()));
                         return;
                     }
-                    let success = !!updated;
-                    let message = success ? 'User updated' : 'User not updated';
+                    foundUser.password = value.password;
+                    foundUser.save((err, updated) => {
+                        if (err) {
+                            res.send(Response.makeResponse(false, err.toString()));
+                            return;
+                        }
+                        let success = !!updated;
+                        let message = success ? 'User password updated' : 'User password not updated';
 
-                    res.send(Response.makeResponse(success, message, updated));
-
-                }, true);   // Must be set to 'true', as this is an update
-
+                        res.send(Response.makeResponse(success, message, updated));
+                    }, true);
+                });
             });
         } catch (e) {
             res.send(Response.makeResponse(false, e.toString()));
         }
     }
 
-    static getUserCart(req, res) {
+    static updateUserDetails(req, res, profilePicUrl) {
         try {
-            let userId = req.params.id;
-            ShoppingCart.getCartItems(userId, (err, items) => {
+            User.validateNewDetails(req, (err, value) => {
                 if (err) {
                     res.send(Response.makeResponse(false, err.toString()));
                     return;
                 }
+                User.fromId(req.params.id, (err, foundUser) => {
+                    if (err) {
+                        res.send(Response.makeResponse(false, err.toString()));
+                        return;
+                    }
+                    // Loops thru whatever 4 values the user submitted for update
+                    for (let key of Object.keys(value))
+                        foundUser[key] = value[key];
 
-                let found = !!items;
-                let message = found ? 'Got shopping cart items' : 'No items in cart';
+                    foundUser.save((err, updated) => {
+                        if (err) {
+                            res.send(Response.makeResponse(false, err.toString()));
+                            return;
+                        }
+                        let success = !!updated;
+                        let message = success ? 'User details updated' : 'User details not updated';
 
-                if (found) {
-                    res.send(Response.makeResponse(found, message, items));
-                } else
-                    res.send(Response.makeResponse(found, message));
+                        res.send(Response.makeResponse(success, message, updated));
+                    }, true);
+                });
+            });
+        } catch (e) {
+            res.send(Response.makeResponse(false, e.toString()));
+        }
+    }
+
+    static updateUserProfileImage(req, res, profilePicUrl) {
+        try {
+            User.fromId(req.params.id, (err, foundUser) => {
+                if (err) {
+                    res.send(Response.makeResponse(false, err.toString()));
+                    return;
+                }
+                foundUser.imageURL = profilePicUrl;
+                foundUser.save((err, updated) => {
+                    if (err) {
+                        res.send(Response.makeResponse(false, err.toString()));
+                        return;
+                    }
+                    let success = !!updated;
+                    let message = success ? 'User profile image updated' : 'User profile image not updated';
+
+                    res.send(Response.makeResponse(success, message, updated));
+                }, true);
             });
         } catch (e) {
             res.send(Response.makeResponse(false, e.toString()));
@@ -147,108 +184,6 @@ module.exports = class UserController {
                     res.send(Response.makeResponse(success, message));
                 })
             });
-        } catch (e) {
-            res.send(Response.makeResponse(false, e.toString()));
-        }
-    }
-
-    static addToCart(req, res) {
-        try {
-            const Product = require('../models/product');   // Not sure if this is the best way... But I need to get a Product's quantity
-            let userId = req.params.userId;
-            let productId = req.body.productId;
-            let quantity = req.body.quantity;
-
-            // Check if the desired "quantity" is a viable amount
-            Product.fromId(productId, (err, prod) => {
-                if (err) {
-                    res.send(Response.makeResponse(false, err.toString()));
-                    return;
-                }
-                if (prod.quantity < quantity) {
-                    let message = `Check product "quantity": The quantity you have asked for is greater than the product stock: ${prod.quantity}`;
-                    res.send(Response.makeResponse(false, message, prod));
-                    return;
-                }
-                let basket = new ShoppingCart();
-                basket.userId = userId;
-                basket.productId = productId;
-                basket.quantity = parseInt(quantity);
-
-                ShoppingCart.itemFromId(userId, productId, (err, foundItem) => {
-                    if (err) {
-                        res.send(Response.makeResponse(false, err.toString()));
-                        return;
-                    }
-
-                    let found = !!foundItem;
-                    if (found) {
-                        basket.id = foundItem.id;
-                        basket.quantity += parseInt(foundItem.quantity);
-                    }
-                    basket.save((err, item) => {
-                        if (err) {
-                            res.send(Response.makeResponse(false, err.toString()));
-                            return;
-                        }
-                        let success = !!item;
-                        let message = item ? `Item with productId #${productId} and quantity ${quantity} added to cart` : 'Item could not be added to cart';
-
-                        res.send(Response.makeResponse(success, message));
-                    }, found);  // <-- If fromId() returned an existing item in this customer's cart, then update=True
-                });
-            });
-
-        } catch (e) {
-            res.send(Response.makeResponse(false, e.toString()));
-        }
-    }
-
-    static deleteFromCart(req, res) {
-        try {
-            let userId = req.params.userId;
-            let productId = req.body.productId;
-            let quantity = req.body.quantity;
-
-            ShoppingCart.itemFromId(userId, productId, (err, item) => {
-                if (err) {
-                    res.send(Response.makeResponse(false, err.toString()));
-                    return;
-                }
-                let found = !!item;
-                if (found) {
-                    if (quantity < item.quantity) {
-                        item.quantity = parseInt(item.quantity) - parseInt(quantity);
-                        item.save((err, updatedItem) => {
-                            if (err) {
-                                res.send(Response.makeResponse(false, err.toString()));
-                                return;
-                            }
-                            let success = !!updatedItem;
-                            let message = updatedItem ? `Item with productId ${productId} and quantity ${quantity} was removed from the cart` :
-                                'Item could not be removed from cart';
-
-                            res.send(Response.makeResponse(success, message, updatedItem));
-                        }, true);
-                    }
-                    else {
-                        item.delete((err, removedItem) => {
-                            if (err) {
-                                res.send(Response.makeResponse(false, err.toString()));
-                                return;
-                            }
-                            let success = !!removedItem;
-                            let message = success ? `All items with productId ${productId} were removed from the cart` : 'Item was not removed from cart';
-                            res.send(Response.makeResponse(success, message));
-                        });
-                    }
-                } else {
-                    let message = `Item with productId ${productId} was not located in shopping cart`;
-                    res.send(Response.makeResponse(false, message));
-                    return;
-                }
-            });
-
         } catch (e) {
             res.send(Response.makeResponse(false, e.toString()));
         }
@@ -296,6 +231,31 @@ module.exports = class UserController {
         }
 
             }
+
+    static getRating(req, res) {
+        try {
+            let id = req.params.id;
+            User.getRating(id, (err, reviews) => {
+                if (err) {
+                    res.send(Response.makeResponse(false, err.toString()));
+                    return;
+                }
+
+                let found = !!reviews;
+                let message = found ? 'Received reviews' : 'No reviews yet';
+
+                if (found) {
+                    res.send(Response.makeResponse(found, message, reviews));
+                }
+                else
+                    res.send(Response.makeResponse(found, message));
+            })
+        } catch (e) {
+
+            res.send(Response.makeResponse(false, e.toString()));
+        }
+    }
+
 
 
     //Sends a new temporary password by email to a client who requests a forgot password
