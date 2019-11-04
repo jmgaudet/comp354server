@@ -12,7 +12,6 @@ const UserController = require('./src/controllers/usercontroller');
 const CartController = require('./src/controllers/cartcontroller');
 const RatingController = require('./src/controllers/ratingcontroller');
 app.use(express.json());
-
 const publicDirectory = path.join(__dirname, 'public');
 const productImageUploads = multer({storage: getProductImageStorage()});
 const profileImageUploads = multer({storage: getProfileImageStorage()});
@@ -110,6 +109,14 @@ app.post('/users', profileImageUploads.any(), (req, res) => {
 });
 
 //check if user is authorized
+app.post('/login/',profileImageUploads.none(), (req, res) => {
+    UserController.userAuth(req, res);
+});
+
+app.post('/passwordreset/', (req, res) => {
+    UserController.passReset(req,res);
+});
+
 app.post('/login', profileImageUploads.none(), (req, res) => {
     UserController.userAuth(req, res);
 });
