@@ -107,7 +107,7 @@ app.post('/users/:id/', profileImageUploads.any(), (req, res) => {
 });
 
 //check if user is authorized
-app.post('/login/', (req, res) => {
+app.post('/login/',profileImageUploads.none(), (req, res) => {
     UserController.userAuth(req, res);
 });
 
