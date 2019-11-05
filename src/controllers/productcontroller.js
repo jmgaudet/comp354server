@@ -19,9 +19,9 @@ module.exports = class ProductController {
         try{
             let page = req.query.page && req.query.page > 0 ? parseInt(req.query.page) : 1;
             let max = req.query.max && req.query.max > 0 ? parseInt(req.query.max) : 10;
-            let sort = req.query.sort;
+            let sort = req.query.sort && req.query.sort !== '' ? req.query.sort : 'price';
             let asc = req.query.asc && req.query.asc === 'true';
-            let search = req.query.search ? req.query.search : '';
+            let search = req.query.search && req.query.search !== '' ? req.query.search : '';
 
             Product.getAllSorted((err, products, pageCount) => {
                 if(err) {
