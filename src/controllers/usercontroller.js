@@ -64,14 +64,18 @@ module.exports = class UserController {
                     res.send(Response.makeResponse(false, err.toString()));
                     return;
                 }
-                validUser.save((err, updated) => {
-                    if (err) {
-                        res.send(Response.makeResponse(false, err.toString()));
-                        return;
-                    }
-                    let success = !!updated;
-                    let message = success ? 'User created' : 'User not created';
-                    res.send(Response.makeResponse(success, message, updated));
+
+                bcrypt.hash(validUser.password, 10, (err, hash) => {
+                    validUser.password = hash;
+                    validUser.save((err, updated) => {
+                        if (err) {
+                            res.send(Response.makeResponse(false, err.toString()));
+                            return;
+                        }
+                        let success = !!updated;
+                        let message = success ? 'User created' : 'User not created';
+                        res.send(Response.makeResponse(success, message, updated));
+                    });
                 });
             });
         } catch (e) {
