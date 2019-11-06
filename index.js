@@ -71,6 +71,10 @@ app.post('/products/', productImageUploads.any(), (req, res) => {
     ProductController.addNewProduct(req, res, imageUrls);
 });
 
+app.get('/users/:userId/products', (req, res) => {
+    ProductController.getAllForUser(req, res);
+});
+
 
 /*~~~~~~~~~~~~ User routes ~~~~~~~~~~~~*/
 

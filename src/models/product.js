@@ -13,6 +13,50 @@ module.exports = class Product extends Model{
         return 'Products';
     }
 
+    static getAllByUserSorted(callback, userId, page = 1, max = 20, orderColumn = 'price', asc = true) {
+        const db = require('../db/database');
+
+        db.query("select count(*) as count from ??", [Product.getTable()], (err, results) => {
+            if(err) {
+                callback(err);
+            }
+            let count = results[0].count;
+            let pageCount = Math.ceil(count/max);
+            let start = (page - 1) * max;
+
+            let query = `SELECT 
+                        p.*,
+                        c.name AS category,
+                        m.name AS manufacturer,
+                        json_arrayagg(i.url)     AS images
+                    FROM
+                        Products p
+                            LEFT JOIN
+                        ProductsCategories pc ON pc.productId = p.id
+                            LEFT JOIN
+                        Manufacturers m ON m.id = p.manufacturerId
+                            LEFT JOIN
+                        ProductsImages i ON i.productId = p.id
+                            LEFT JOIN
+                        Categories c ON c.id = pc.categoryId
+                        where p.sellerId = ? 
+                        group by p.id, c.name
+                    order by ?? ${asc ? 'ASC' : 'DESC'} limit ?,?`;
+            let params = [userId, orderColumn, start, max];
+
+            db.query(query, params, (err, products) => {
+                if(err) {
+                    callback(err);
+                }
+                products.forEach((prod) => {
+                    prod.images = JSON.parse(prod.images);
+                });
+                callback(null, products, pageCount);
+            });
+        });
+
+    }
+
     static getAllSorted(callback, search = '', page = 1, max = 20, orderColumn = 'price', asc = true) {
         const db = require('../db/database');
 

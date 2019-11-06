@@ -1,4 +1,5 @@
 const Product = require('../models/product');
+const User = require('../models/user');
 const Category = require('../models/category');
 const Manufacturer = require('../models/manufacturer');
 const Response = require('../api/response');
@@ -9,6 +10,33 @@ const Response = require('../api/response');
  * @type {ProductController}
  */
 module.exports = class ProductController {
+
+    static getAllForUser(req, res) {
+        try {
+            let page = req.query.page && req.query.page > 0 ? parseInt(req.query.page) : 1;
+            let max = req.query.max && req.query.max > 0 ? parseInt(req.query.max) : 10;
+            let sort = req.query.sort && req.query.sort !== '' ? req.query.sort : 'price';
+            let asc = req.query.asc && req.query.asc === 'true';
+            let userId = req.params.userId;
+            let productId = req.params.id;
+
+            User.fromId(userId, (err, user) => {
+                if(err) {
+                    res.send(Response.makeResponse(false, err.toString()));
+                } else {
+                    Product.getAllByUserSorted((err, products, pageCount) => {
+                        if(err) {
+                            res.send(Response.makeResponse(false, err.toString()));
+                        } else {
+                            res.send(Response.makeResponse(true, 'All products for user', products, pageCount))
+                        }
+                    }, userId, page, max, sort, asc);
+                }
+            });
+        }catch (e) {
+            res.send(Response.makeResponse(false, e.toString()));
+        }
+    }
 
     /**
      * Return all products by page
