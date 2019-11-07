@@ -148,6 +148,14 @@ app.post('/users/:id/cart', (req, res) => {
     CartController.addToCart(req, res);
 });
 
+app.put('/users/:id/cart', (req, res) => {
+    CartController.updateQuantity(req, res);
+});
+
+app.post('/users/:id/cart/order', (req, res) => {
+    CartController.createOrder(req, res);
+});
+
 
 /*================== End Routes =====================*/
 

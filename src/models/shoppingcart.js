@@ -13,7 +13,7 @@ module.exports = class ShoppingCart extends Model {
     /*
     A ShoppingCart item needs 2 (not 1) IDs to be found: a userId and a productId.
      */
-    static itemFromId(userId, productId, callback, dryRun = false) {
+    static itemFromIds(userId, productId, callback, dryRun = false) {
         const db = require('../db/database');
 
         const query = 'select * from ?? where `userId` = ? and `productId` = ?';
@@ -45,7 +45,12 @@ module.exports = class ShoppingCart extends Model {
             if (err) {
                 callback(err);
             } else {
-                callback(null, results);
+                let r = [];
+                results.forEach((obj) => {
+                    let model = new this(obj);
+                    r.push(model);
+                });
+                callback(null, r);
             }
         });
         return db.format(query, params);
