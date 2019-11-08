@@ -151,7 +151,7 @@ module.exports = class UserController {
                     res.send(Response.makeResponse(false, err.toString()));
                     return;
                 }
-                foundUser.imageURL = profilePicUrl;
+                foundUser.imageUrl = profilePicUrl;
                 foundUser.save((err, updated) => {
                     if (err) {
                         res.send(Response.makeResponse(false, err.toString()));

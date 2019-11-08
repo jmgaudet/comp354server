@@ -1,4 +1,6 @@
 require('dotenv').config();
+const AWS = require('aws-sdk');
+const fs = require('fs');
 const path = require('path');
 const url = require('url');
 const crypto = require('crypto');
@@ -67,7 +69,10 @@ app.delete('/products/:id/', (req, res) => {
 app.post('/products/', productImageUploads.any(), (req, res) => {
     let imageUrls = [];
     req.files.forEach((file) => {
-        imageUrls.push(getProductImageUrl(getBaseUrl(req), file.filename));
+        (async() => {
+            let url = await getProductImageUrl(file.filename);
+            imageUrls.push(url);
+        })();
     });
     ProductController.addNewProduct(req, res, imageUrls);
 });
@@ -93,8 +98,11 @@ app.delete('/users/:id', (req, res) => {
 
 // Update: profile picture
 app.put('/users/:id/profileImage', profileImageUploads.any(), (req, res) => {
-    let profilePicUrl = getProfileImageUrl(getBaseUrl(req), req.files[0].filename);
-    UserController.updateUserProfileImage(req, res, profilePicUrl);
+    (async() => {
+        let profilePicUrl = await getProfileImageUrl(req.files[0].filename);
+        UserController.updateUserProfileImage(req, res, profilePicUrl);
+    })()
+
 });
 
 // Update: firstName, lastName, primaryAddress, alternateAddress
@@ -109,8 +117,10 @@ app.put('/users/:id/password', (req, res) => {
 });
 
 app.post('/users', profileImageUploads.any(), (req, res) => {
-    let profilePicUrl = getProfileImageUrl(getBaseUrl(req), req.files[0].filename);     // Only taking the first file
-    UserController.addNewUser(req, res, profilePicUrl);
+    (async() => {
+        let profilePicUrl = await getProfileImageUrl(req.files[0].filename);     // Only taking the first file
+        UserController.addNewUser(req, res, profilePicUrl);
+    })();
 });
 
 //check if user is authorized
@@ -191,10 +201,37 @@ function getBaseUrl(req) {
     return req.protocol + '://' + req.get('host');
 }
 
-function getProfileImageUrl(baseUrl, filename) {
-    return url.resolve(baseUrl, `/profiles/${filename}`);
+function getProfileImageUrl(filename) {
+    let p = path.join(publicDirectory, 'profiles', filename);
+    return uploadToAWS(p, `profiles/${filename}`);
 }
 
-function getProductImageUrl(baseUrl, filename) {
-    return url.resolve(baseUrl, `/product_images/${filename}`);
+function getProductImageUrl(filename) {
+    let p = path.join(publicDirectory, 'product_images', filename);
+    return uploadToAWS(p, `products/${filename}`);
 }
+
+async function uploadToAWS(fileName, key) {
+    const s3 = new AWS.S3({
+        accessKeyId: process.env.ACCESS_KEY_ID,
+        secretAccessKey: process.env.SECRET_ACCESS_KEY
+    });
+
+    // Read content from the file
+    const fileContent = fs.readFileSync(fileName);
+
+    // Setting up S3 upload parameters
+    const params = {
+        Bucket: 'comp354-allan',
+        Key: key, // File name you want to save as in S3
+        Body: fileContent,
+        ACL: 'public-read'
+    };
+
+    // Uploading files to the bucket
+    const data = await s3.upload(params).promise().catch(e => {
+        console.log(e)
+    });
+    let url = data.Location;
+    return url;
+};
