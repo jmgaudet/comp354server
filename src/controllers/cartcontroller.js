@@ -56,7 +56,7 @@ module.exports = class CartController {
                     basket.productId = productId;
                     basket.quantity = parseInt(quantity);
 
-                    ShoppingCart.itemFromId(userId, productId, (err, foundItem) => {
+                    ShoppingCart.itemFromIds(userId, productId, (err, foundItem) => {
                         if (err) {
                             res.send(Response.makeResponse(false, err.toString()));
                             return;
@@ -93,7 +93,7 @@ module.exports = class CartController {
             let productId = req.body.productId;
             let quantity = req.body.quantity;
 
-            ShoppingCart.itemFromId(userId, productId, (err, item) => {
+            ShoppingCart.itemFromIds(userId, productId, (err, item) => {
                 if (err) {
                     res.send(Response.makeResponse(false, err.toString()));
                     return;
@@ -108,7 +108,7 @@ module.exports = class CartController {
                                 return;
                             }
                             let success = !!updatedItem;
-                            let message = updatedItem ? `Item with productId ${productId} and quantity ${quantity} was removed from the cart` :
+                            let message = success ? `Item with productId ${productId} and quantity ${quantity} was removed from the cart` :
                                 'Item could not be removed from cart';
 
                             res.send(Response.makeResponse(success, message, updatedItem));
@@ -137,4 +137,16 @@ module.exports = class CartController {
         }
     }
 
-}
+    static updateQuantity(req, res) {
+        try {
+            let userId = req.params.id;
+            let quantity = req.body.quantity;
+
+
+        } catch (e) {
+            res.send(Response.makeResponse(false, e.toString()));
+        }
+    }
+
+
+};
