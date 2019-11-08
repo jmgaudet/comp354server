@@ -67,14 +67,15 @@ app.delete('/products/:id/', (req, res) => {
 });
 
 app.post('/products/', productImageUploads.any(), (req, res) => {
-    let imageUrls = [];
-    req.files.forEach((file) => {
-        (async() => {
-            let url = await getProductImageUrl(file.filename, file.mimetype);
+
+    (async () => {
+        let imageUrls = [];
+        for(let i = 0; i < req.files.length; i++) {
+            let url = await getProductImageUrl(req.files[i].filename, req.files[i].mimetype);
             imageUrls.push(url);
-        })();
-    });
-    ProductController.addNewProduct(req, res, imageUrls);
+        }
+        ProductController.addNewProduct(req, res, imageUrls);
+    })();
 });
 
 app.get('/users/:userId/products', (req, res) => {
@@ -98,7 +99,7 @@ app.delete('/users/:id', (req, res) => {
 
 // Update: profile picture
 app.put('/users/:id/profileImage', profileImageUploads.any(), (req, res) => {
-    (async() => {
+    (async () => {
         let profilePicUrl = await getProfileImageUrl(req.files[0].filename, req.files[0].mimetype);
         UserController.updateUserProfileImage(req, res, profilePicUrl);
     })()
@@ -117,19 +118,19 @@ app.put('/users/:id/password', (req, res) => {
 });
 
 app.post('/users', profileImageUploads.any(), (req, res) => {
-    (async() => {
+    (async () => {
         let profilePicUrl = await getProfileImageUrl(req.files[0].filename, req.files[0].mimetype);     // Only taking the first file
         UserController.addNewUser(req, res, profilePicUrl);
     })();
 });
 
 //check if user is authorized
-app.post('/login/',profileImageUploads.none(), (req, res) => {
+app.post('/login/', profileImageUploads.none(), (req, res) => {
     UserController.userAuth(req, res);
 });
 
 app.post('/passwordreset/', (req, res) => {
-    UserController.passReset(req,res);
+    UserController.passReset(req, res);
 });
 
 app.get('/users/:id/ratings', (req, res) => {
