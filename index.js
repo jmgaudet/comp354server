@@ -70,7 +70,7 @@ app.post('/products/', productImageUploads.any(), (req, res) => {
     let imageUrls = [];
     req.files.forEach((file) => {
         (async() => {
-            let url = await getProductImageUrl(file.filename);
+            let url = await getProductImageUrl(file.filename, file.mimetype);
             imageUrls.push(url);
         })();
     });
@@ -99,7 +99,7 @@ app.delete('/users/:id', (req, res) => {
 // Update: profile picture
 app.put('/users/:id/profileImage', profileImageUploads.any(), (req, res) => {
     (async() => {
-        let profilePicUrl = await getProfileImageUrl(req.files[0].filename);
+        let profilePicUrl = await getProfileImageUrl(req.files[0].filename, req.files[0].mimetype);
         UserController.updateUserProfileImage(req, res, profilePicUrl);
     })()
 
@@ -118,7 +118,7 @@ app.put('/users/:id/password', (req, res) => {
 
 app.post('/users', profileImageUploads.any(), (req, res) => {
     (async() => {
-        let profilePicUrl = await getProfileImageUrl(req.files[0].filename);     // Only taking the first file
+        let profilePicUrl = await getProfileImageUrl(req.files[0].filename, req.files[0].mimetype);     // Only taking the first file
         UserController.addNewUser(req, res, profilePicUrl);
     })();
 });
@@ -201,17 +201,17 @@ function getBaseUrl(req) {
     return req.protocol + '://' + req.get('host');
 }
 
-function getProfileImageUrl(filename) {
+function getProfileImageUrl(filename, mimeType) {
     let p = path.join(publicDirectory, 'profiles', filename);
-    return uploadToAWS(p, `profiles/${filename}`);
+    return uploadToAWS(p, `profiles/${filename}`, mimeType);
 }
 
-function getProductImageUrl(filename) {
+function getProductImageUrl(filename, mimeType) {
     let p = path.join(publicDirectory, 'product_images', filename);
-    return uploadToAWS(p, `products/${filename}`);
+    return uploadToAWS(p, `products/${filename}`, mimeType);
 }
 
-async function uploadToAWS(fileName, key) {
+async function uploadToAWS(fileName, key, mimeType) {
     const s3 = new AWS.S3({
         accessKeyId: process.env.ACCESS_KEY_ID,
         secretAccessKey: process.env.SECRET_ACCESS_KEY
@@ -225,7 +225,8 @@ async function uploadToAWS(fileName, key) {
         Bucket: 'comp354-allan',
         Key: key, // File name you want to save as in S3
         Body: fileContent,
-        ACL: 'public-read'
+        ACL: 'public-read',
+        ContentType: mimeType
     };
 
     // Uploading files to the bucket
