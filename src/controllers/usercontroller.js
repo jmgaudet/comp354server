@@ -111,7 +111,7 @@ module.exports = class UserController {
         }
     }
 
-    static updateUserDetails(req, res, profilePicUrl) {
+    static updateUserDetails(req, res) {
         try {
             User.validateNewDetails(req, (err, value) => {
                 if (err) {

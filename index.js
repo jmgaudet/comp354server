@@ -11,6 +11,7 @@ const ProductController = require('./src/controllers/productcontroller');
 const UserController = require('./src/controllers/usercontroller');
 const CartController = require('./src/controllers/cartcontroller');
 const RatingController = require('./src/controllers/ratingcontroller');
+const OrderController = require('./src/controllers/ordercontroller');
 app.use(express.json());
 const publicDirectory = path.join(__dirname, 'public');
 const productImageUploads = multer({storage: getProductImageStorage()});
@@ -121,10 +122,6 @@ app.post('/passwordreset/', (req, res) => {
     UserController.passReset(req,res);
 });
 
-app.post('/login', profileImageUploads.none(), (req, res) => {
-    UserController.userAuth(req, res);
-});
-
 app.get('/users/:id/ratings', (req, res) => {
     UserController.getRating(req, res);
 });
@@ -148,6 +145,20 @@ app.post('/users/:id/cart', (req, res) => {
     CartController.addToCart(req, res);
 });
 
+app.put('/users/:id/cart', (req, res) => {
+    CartController.updateQuantity(req, res);
+});
+
+
+/*~~~~~~~~~~~~ Order routes ~~~~~~~~~~~~*/
+
+app.get('/users/:id/orders', (req, res) => {
+    OrderController.getUserOrders(req, res);
+});
+
+app.post('/users/:id/orders', (req, res) => {
+    OrderController.createOrder(req, res);
+});
 
 /*================== End Routes =====================*/
 
