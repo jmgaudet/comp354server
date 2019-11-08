@@ -10,7 +10,27 @@ module.exports = class Order extends Model {
         return "Orders";
     }
 
-    // getUserTotal
+    static getOrderByUser(userId, callback, dryRun = false) {
+        const db = require('../db/database');
+
+        const query = 'select * from ?? where `buyerId` = ?';
+        const params = [Order.getTable(), userId];
+
+        if (!dryRun) db.query(query, params, (err, results) => {
+            if (err) {
+                callback(err, null);
+            } else {
+                let r = [];
+                results.forEach((obj) => {
+                    let model = new this(obj);
+                    r.push(model);
+                });
+                callback(null, r);
+            }
+        });
+
+        return db.format(query, params);
+    }
 
     // getUserTotalOnDate
 
