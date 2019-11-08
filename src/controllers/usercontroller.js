@@ -1,5 +1,3 @@
-
-
 require('dotenv').config();
 const User = require('../models/user');
 const Response = require('../api/response');
@@ -217,7 +215,7 @@ module.exports = class UserController {
 
                 //if found then compare the password entered to whats stored using bcrypt's compare method.
                 if (success) {
-                    bcrypt.compare(passwordNonHash, foundUser.password, function(err, res1) {
+                    bcrypt.compare(passwordNonHash, foundUser.password, function (err, res1) {
                         if (res1) {
                             res.send(Response.makeResponse(true, 'User is Authorized', foundUser));
                         } else {
@@ -234,7 +232,7 @@ module.exports = class UserController {
             res.send(Response.makeResponse(false, e.toString()));
         }
 
-            }
+    }
 
     static getRating(req, res) {
         try {
@@ -250,8 +248,7 @@ module.exports = class UserController {
 
                 if (found) {
                     res.send(Response.makeResponse(found, message, reviews));
-                }
-                else
+                } else
                     res.send(Response.makeResponse(found, message));
             })
         } catch (e) {
@@ -261,69 +258,67 @@ module.exports = class UserController {
     }
 
 
-
     //Sends a new temporary password by email to a client who requests a forgot password
     static passReset(req, res) {
         let email = req.body.email;
         try {
-                    //Check for matching email
-                    User.fromEmail(email, (err, user) => {
-                        if (err) {
-                            res.send(Response.makeResponse(false, err.toString()));
-                            return;
-                        }
-                        //Check email matches in the database
-                        if(user.email === email) {
-                            //Create a new 10 character password from a set of symbols
-                            let newPassW = '';
-                            let listOfChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_*$%&#!.,[]{}();?<>';
-                            let charactersLength = listOfChars.length;
-                            for ( let i = 0; i < 10; i++ ) {
-                                newPassW = newPassW.concat(listOfChars.charAt(Math.floor(Math.random() * charactersLength)));
-                            }
+            //Check for matching email
+            User.fromEmail(email, (err, user) => {
+                if (err) {
+                    res.send(Response.makeResponse(false, err.toString()));
+                    return;
+                }
+                //Check email matches in the database
+                if (user.email === email) {
+                    //Create a new 10 character password from a set of symbols
+                    let newPassW = '';
+                    let listOfChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_*$%&#!.,[]{}();?<>';
+                    let charactersLength = listOfChars.length;
+                    for (let i = 0; i < 10; i++) {
+                        newPassW = newPassW.concat(listOfChars.charAt(Math.floor(Math.random() * charactersLength)));
+                    }
 
-                            //Encrypt the generated password to store in the database
-                            let encryptedNewPassW;
-                            bcrypt.hash(newPassW, 10, (err, hash) => {
-                                if(err)
+                    //Encrypt the generated password to store in the database
+                    let encryptedNewPassW;
+                    bcrypt.hash(newPassW, 10, (err, hash) => {
+                        if (err)
+                            res.send(Response.makeResponse(false, err.toString()));
+                        else {
+                            encryptedNewPassW = hash;
+                            user.password = encryptedNewPassW;
+                            user.save((err, user) => {
+                                if (err)
                                     res.send(Response.makeResponse(false, err.toString()));
-                                else{
-                                    encryptedNewPassW = hash;
-                                    user.password = encryptedNewPassW;
-                                    user.save((err, user) => {
-                                        if (err)
+                                else {
+                                    const transporter = nodemailer.createTransport(sparkPostTransport({
+                                        sparkPostApiKey: process.env.SPARKPOST_API_KEY
+                                    }));
+                                    //Create email to user with new temporary password
+                                    let sendingNewPassWMail = {
+                                        from: 'no-reply@allanpichardo.com',
+                                        to: '354testerlinda@gmail.com', //TODO: this is a temporary testing email account to receive the forgot password emails
+                                        //to: user.email,               //TODO: once users have actual associated emails, we could use this
+                                        subject: 'New Temporary Password for 354TheStars Website',
+                                        html: 'Hello,<br></br><br>Here is your new password: </br>' +
+                                            newPassW + '<br></br><br></br>' +
+                                            'Please make sure to change it once you login with this password.<br></br><br></br>' +
+                                            'Thank you,<br></br><br></br>354TheStars Team'
+                                    };
+                                    //Send created email to user via nodemailer's transporter
+                                    transporter.sendMail(sendingNewPassWMail, function (err, info) {
+                                        if (err) {
                                             res.send(Response.makeResponse(false, err.toString()));
-                                        else
-                                        {
-                                            const transporter = nodemailer.createTransport(sparkPostTransport({
-                                                sparkPostApiKey: process.env.SPARKPOST_API_KEY
-                                            }));
-                                            //Create email to user with new temporary password
-                                            let sendingNewPassWMail = {
-                                                from: 'no-reply@allanpichardo.com',
-                                                to: '354testerlinda@gmail.com', //TODO: this is a temporary testing email account to receive the forgot password emails
-                                                //to: user.email,               //TODO: once users have actual associated emails, we could use this
-                                                subject: 'New Temporary Password for 354TheStars Website',
-                                                html: 'Hello,<br></br><br>Here is your new password: </br>' +
-                                                    newPassW + '<br></br><br></br>' +
-                                                    'Please make sure to change it once you login with this password.<br></br><br></br>' +
-                                                    'Thank you,<br></br><br></br>354TheStars Team'
-                                            };
-                                            //Send created email to user via nodemailer's transporter
-                                            transporter.sendMail(sendingNewPassWMail, function (err, info) {
-                                                if (err) {
-                                                    res.send(Response.makeResponse(false, err.toString()));
-                                                } else {
-                                                    res.send(Response.makeResponse(true, 'User new password email was successfully sent'));
-                                                }
-                                            });
+                                        } else {
+                                            res.send(Response.makeResponse(true, 'User new password email was successfully sent'));
                                         }
-                                    }, true);
+                                    });
                                 }
-                            });
-                        } else {    //Enter if password change was not successful due to incorrect email
-                            res.send(Response.makeResponse(false,'User password change was not done'));
+                            }, true);
                         }
+                    });
+                } else {    //Enter if password change was not successful due to incorrect email
+                    res.send(Response.makeResponse(false, 'User password change was not done'));
+                }
             });
         } catch (e) {
             res.send(Response.makeResponse(false, e.toString()));
