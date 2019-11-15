@@ -129,7 +129,7 @@ app.post('/login/', profileImageUploads.none(), (req, res) => {
     UserController.userAuth(req, res);
 });
 
-app.post('/passwordreset/', (req, res) => {
+app.post('/passwordreset/', profileImageUploads.none(), (req, res) => {
     UserController.passReset(req, res);
 });
 
