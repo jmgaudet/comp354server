@@ -11,9 +11,7 @@ module.exports = class OrderController {
                     res.send(Response.makeResponse(false, err.toString()));
                     return;
                 }
-                let success = !!orders[0];  // orders is always an array -- have to be more specific
-                let message = success ? `Got user's sales with user id ${userId}` : `Could not get user's sales`;
-                res.send(Response.makeResponse(success, message, orders));
+                res.send(Response.makeResponse(true, "Got user sales", orders));
             });
         } catch (e) {
             res.send(Response.makeResponse(false, e.toString()));
@@ -113,9 +111,7 @@ module.exports = class OrderController {
                     res.send(Response.makeResponse(false, err.toString()));
                     return;
                 }
-                let success = !!orders[0];  // orders is always an array -- have to be more specific
-                let message = success ? `Got user's orders with user id ${userId}` : `Could not get user's orders`;
-                res.send(Response.makeResponse(success, message, orders));
+                res.send(Response.makeResponse(true, "Got user orders", orders));
             });
         } catch (e) {
             res.send(Response.makeResponse(false, e.toString()));
