@@ -94,7 +94,20 @@ module.exports = class User extends Model {
         });
         return db.format(query, params);
     }
+    static getRatingBySeller(id,callback,dryrun=false) {
+        const db = require('../db/database');
 
+        let params = [Rating.getTable(), id];
+        const query = 'select * from ?? where `sellerId` = ?';
+        if (!dryrun) db.query(query, params, (err, results) => {
+            if (err) {
+                callback(err);
+            } else {
+                callback(null, results);
+            }
+        });
+        return db.format(query, params);
+    }
     toJson() {
         return {
             id: this.id,

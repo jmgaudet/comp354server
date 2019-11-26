@@ -141,6 +141,10 @@ app.get('/ratings/:id/', (req, res) => {
     RatingController.getRating(req, res);
 });
 
+app.get('/seller/:id/ratings', (req, res) => {
+    UserController.getRatingBySeller(req, res);
+});
+
 app.post('/ratings', (req,res) =>{
     RatingController.addRating(req,res);
 });
