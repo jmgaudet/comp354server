@@ -167,6 +167,10 @@ app.get('/users/:id/orders', (req, res) => {
     OrderController.getUserOrders(req, res);
 });
 
+app.get('/users/:id/sales', (req, res) => {
+    OrderController.getUserSales(req, res);
+});
+
 app.post('/users/:id/orders', (req, res) => {
     OrderController.createOrder(req, res);
 });
