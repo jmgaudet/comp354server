@@ -22,18 +22,18 @@ module.exports = class Rating extends Model {
         }
     }
 
-    static getRatingById(id,callback,dryrun=false) {
-        const db = require('../db/database');
+    // static getRatingById(id,callback,dryrun=false) {
+    //     const db = require('../db/database');
 
-        let params = [Rating.getTable(), id];
-        const query = 'select * from ?? where `id` = ?';
-        if (!dryrun) db.query(query, params, (err, results) => {
-            if (err) {
-                callback(err);
-            } else {
-                callback(null, results);
-            }
-        });
-        return db.format(query, params);
-    }
+    //     let params = [Rating.getTable(), id];
+    //     const query = 'select * from ?? where `id` = ?';
+    //     if (!dryrun) db.query(query, params, (err, results) => {
+    //         if (err) {
+    //             callback(err);
+    //         } else {
+    //             callback(null, results);
+    //         }
+    //     });
+    //     return db.format(query, params);
+    // }
 };
