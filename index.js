@@ -153,6 +153,10 @@ app.put('/ratings/:id/', (req,res) =>{
 app.put('/ratings/user/:id/', (req,res) =>{
     RatingController.updateRatingByBuyer(req,res);
 });
+
+app.delete('/ratings/:id/', (req,res)=>{
+   RatingController.deleteRating(req,res); 
+});
 /*~~~~~~~~~~~~ Cart routes ~~~~~~~~~~~~*/
 
 app.get('/users/:id/cart', (req, res) => {

@@ -164,4 +164,29 @@ module.exports = class RatingController {
             res.send(Response.makeResponse(false, e.toString()));
         }
     }
+
+    static deleteRating(req, res) {
+        try{
+            let id = req.params.id;
+            Rating.fromId(id, (err, rating) => {
+                if(err) {
+                    res.send(Response.makeResponse(false, err.toString()));
+                    return;
+                }
+                rating.delete((err, success) => {
+                    if(err) {
+                        res.send(Response.makeResponse(false, err.toString()));
+                        return;
+                    }
+                    let message = success ? 'Rating deleted' : 'Rating not deleted';
+
+                    res.send(Response.makeResponse(success, message));
+                    }
+                )
+            });
+        }catch (e) {
+            res.send(Response.makeResponse(false, e.toString()));
+        }
+
+    }
 }
