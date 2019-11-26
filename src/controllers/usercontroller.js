@@ -65,14 +65,14 @@ module.exports = class UserController {
 
                 bcrypt.hash(validUser.password, 10, (err, hash) => {
                     validUser.password = hash;
-                    validUser.save((err, updated) => {
+                    validUser.save((err, createdUser) => {
                         if (err) {
                             res.send(Response.makeResponse(false, err.toString()));
                             return;
                         }
-                        let success = !!updated;
+                        let success = !!createdUser;
                         let message = success ? 'User created' : 'User not created';
-                        res.send(Response.makeResponse(success, message, updated));
+                        res.send(Response.makeResponse(success, message, createdUser));
                     });
                 });
             });
@@ -83,6 +83,8 @@ module.exports = class UserController {
 
     static updateUserPassword(req, res) {
         try {
+            let currentPassword = req.body.currentPassword;
+            let newPassword = req.body.newPassword;
             User.validateNewPassword(req, (err, value) => {
                 if (err) {
                     res.send(Response.makeResponse(false, err.toString()));
@@ -93,17 +95,30 @@ module.exports = class UserController {
                         res.send(Response.makeResponse(false, err.toString()));
                         return;
                     }
-                    foundUser.password = value.password;
-                    foundUser.save((err, updated) => {
-                        if (err) {
-                            res.send(Response.makeResponse(false, err.toString()));
-                            return;
-                        }
-                        let success = !!updated;
-                        let message = success ? 'User password updated' : 'User password not updated';
+                    bcrypt.compare(value.currentPassword, foundUser.password, function (err, res1) {
+                        if (res1) {
+                            bcrypt.hash(value.newPassword, 10, (err, hashedNewPassword) => {
+                                if (err)
+                                    res.send(Response.makeResponse(false, err.toString()));
+                                else {
+                                    foundUser.password = hashedNewPassword;
+                                    foundUser.save((err, updated) => {
+                                        if (err) {
+                                            res.send(Response.makeResponse(false, err.toString()));
+                                            return;
+                                        }
+                                        let success = !!updated;
+                                        let message = success ? 'User password updated' : 'User password not updated';
 
-                        res.send(Response.makeResponse(success, message, updated));
-                    }, true);
+                                        res.send(Response.makeResponse(success, message, updated));
+                                    }, true);
+                                }
+                            });
+                        } else {
+                            res.send(Response.makeResponse(false, `"currentPassword" does not match database.`));
+                        }
+                    });
+                    foundUser.password = value.password;
                 });
             });
         } catch (e) {

@@ -51,7 +51,8 @@ module.exports = class User extends Model {
     static validateNewPassword(req, callback) {
 
         const schema = Joi.object().keys({
-            password: Joi.string().min(8).required(),
+            currentPassword: Joi.string().required(),
+            newPassword: Joi.string().min(8).required()
         });
 
         const {error, value} = schema.validate(req.body);
