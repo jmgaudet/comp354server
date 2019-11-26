@@ -141,7 +141,18 @@ app.get('/ratings/:id/', (req, res) => {
     RatingController.getRating(req, res);
 });
 
+app.post('/ratings', (req,res) =>{
+    RatingController.addRating(req,res);
+});
 
+app.put('/ratings/:id/', (req,res) =>{
+    RatingController.updateRatingBySeller(req,res);
+});
+
+
+app.put('/ratings/user/:id/', (req,res) =>{
+    RatingController.updateRatingByBuyer(req,res);
+});
 /*~~~~~~~~~~~~ Cart routes ~~~~~~~~~~~~*/
 
 app.get('/users/:id/cart', (req, res) => {
@@ -165,6 +176,10 @@ app.put('/users/:id/cart', (req, res) => {
 
 app.get('/users/:id/orders', (req, res) => {
     OrderController.getUserOrders(req, res);
+});
+
+app.get('/users/:id/sales', (req, res) => {
+    OrderController.getUserSales(req, res);
 });
 
 app.post('/users/:id/orders', (req, res) => {
