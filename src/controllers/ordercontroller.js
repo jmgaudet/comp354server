@@ -3,6 +3,23 @@ const Response = require('../api/response');
 
 module.exports = class OrderController {
 
+    static getUserSales(req, res) {
+        try {
+            let userId = req.params.id;
+            Order.getSalesByUser(userId, (err, orders) => {
+                if (err) {
+                    res.send(Response.makeResponse(false, err.toString()));
+                    return;
+                }
+                let success = !!orders[0];  // orders is always an array -- have to be more specific
+                let message = success ? `Got user's sales with user id ${userId}` : `Could not get user's sales`;
+                res.send(Response.makeResponse(success, message, orders));
+            });
+        } catch (e) {
+            res.send(Response.makeResponse(false, e.toString()));
+        }
+    }
+
     static createOrder(req, res) {
         try {
             const ShoppingCart = require('../models/shoppingcart');
