@@ -272,6 +272,28 @@ module.exports = class UserController {
         }
     }
 
+    static getRatingBySeller(req, res) {
+        try {
+            let id = req.params.id;
+            User.getRatingBySeller(id, (err, reviews) => {
+                if (err) {
+                    res.send(Response.makeResponse(false, err.toString()));
+                    return;
+                }
+
+                let found = !!reviews;
+                let message = found ? 'Received reviews' : 'No reviews yet';
+
+                if (found) {
+                    res.send(Response.makeResponse(found, message, reviews));
+                } else
+                    res.send(Response.makeResponse(found, message));
+            })
+        } catch (e) {
+
+            res.send(Response.makeResponse(false, e.toString()));
+        }
+    }
 
     //Sends a new temporary password by email to a client who requests a forgot password
     static passReset(req, res) {
