@@ -257,14 +257,19 @@ module.exports = class UserController {
                     res.send(Response.makeResponse(false, err.toString()));
                     return;
                 }
+                if (err) {
+                    res.send(Response.makeResponse(false, err.toString()));
+                    return;
+                }
+                let message = '';
+                if (reviews[0] == undefined) {
+                    message = 'No reviews yet';
+                    reviews = [{'rate': 'N/A'}]
+                } else {
+                    message = 'Received reviews';
 
-                let found = !!reviews;
-                let message = found ? 'Received reviews' : 'No reviews yet';
-
-                if (found) {
-                    res.send(Response.makeResponse(found, message, reviews));
-                } else
-                    res.send(Response.makeResponse(found, message));
+                }
+                res.send(Response.makeResponse(true, message, reviews));
             })
         } catch (e) {
 
@@ -280,14 +285,16 @@ module.exports = class UserController {
                     res.send(Response.makeResponse(false, err.toString()));
                     return;
                 }
+                let message = '';
+                if (reviews[0] == undefined) {
+                    message = 'No reviews yet';
+                    reviews = [{'rate': 'N/A'}]
+                } else {
+                    message = 'Received reviews';
 
-                let found = !!reviews;
-                let message = found ? 'Received reviews' : 'No reviews yet';
+                }
 
-                if (found) {
-                    res.send(Response.makeResponse(found, message, reviews));
-                } else
-                    res.send(Response.makeResponse(found, message));
+                res.send(Response.makeResponse(true, message, reviews));
             })
         } catch (e) {
 
