@@ -82,6 +82,10 @@ app.get('/users/:userId/products', (req, res) => {
     ProductController.getAllForUser(req, res);
 });
 
+app.put('/products/:id/details', productImageUploads.none(), (req, res) => {
+    ProductController.updateProductDetails(req, res);
+});
+
 
 /*~~~~~~~~~~~~ User routes ~~~~~~~~~~~~*/
 
