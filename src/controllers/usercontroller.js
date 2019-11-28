@@ -59,6 +59,9 @@ module.exports = class UserController {
      */
     static getAllUsers(req, res) {
         try {
+            let page = req.query.page && req.query.page > 0 ? parseInt(req.query.page) : 1;
+            let max = req.query.max && req.query.max > 0 ? parseInt(req.query.max) : 10;
+
             User.getAll((err, users) => {
                 if (err) {
                     res.send(Response.makeResponse(false, err.toString()));
@@ -66,7 +69,7 @@ module.exports = class UserController {
                 }
 
                 res.send(Response.makeResponse(true, 'Got users', users));
-            })
+            }, page, max);
         } catch (e) {
             res.send(Response.makeResponse(false, e.toString()));
         }
