@@ -86,6 +86,9 @@ app.put('/products/:id/details', productImageUploads.none(), (req, res) => {
     ProductController.updateProductDetails(req, res);
 });
 
+app.get('/admin/stats', (req, res) => {
+    UserController.getAdminStats(req, res);
+});
 
 /*~~~~~~~~~~~~ User routes ~~~~~~~~~~~~*/
 
