@@ -98,7 +98,7 @@ module.exports = class User extends Model {
         const db = require('../db/database');
 
         let params = [Rating.getTable(), id];
-        const query = 'select * from ?? where `sellerId` = ?';
+        const query = 'select Rating.*, Users.firstName, Users.lastName from ?? JOIN Users ON Rating.userId = Users.id where `sellerId` = ? ';
         if (!dryrun) db.query(query, params, (err, results) => {
             if (err) {
                 callback(err);
