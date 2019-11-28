@@ -1,5 +1,6 @@
 require('dotenv').config();
 const User = require('../models/user');
+const Order = require('../models/order');
 const Response = require('../api/response');
 const bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');
@@ -7,6 +8,34 @@ const sparkPostTransport = require('nodemailer-sparkpost-transport');
 
 
 module.exports = class UserController {
+
+    static getSellerStats(req, res) {
+        try {
+            let userId = req.params.id;
+
+            Order.getSalesByUser(userId, (err, orders) => {
+                if(err) {
+                    res.send(Response.makeResponse(false, err.toString()));
+                } else {
+                    let totalSold = orders.length;
+                    let totalRevenue = 0;
+
+                    orders.forEach((order) => {
+                        totalRevenue += order.totalCost;
+                    });
+
+                    let stats = {
+                        totalUnits: totalSold,
+                        totalRevenue: totalRevenue
+                    };
+
+                    res.send(Response.makeResponse(true, "Got sale stats", stats));
+                }
+            });
+        }catch (e) {
+            res.send(Response.makeResponse(false, e.toString()));
+        }
+    }
 
     /**
      * Returns all users currently in the database
