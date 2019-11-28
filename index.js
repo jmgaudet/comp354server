@@ -89,6 +89,10 @@ app.put('/products/:id/details', productImageUploads.none(), (req, res) => {
 
 /*~~~~~~~~~~~~ User routes ~~~~~~~~~~~~*/
 
+app.get('/users/:id/stats', (req, res) => {
+    UserController.getSellerStats(req, res);
+});
+
 app.get('/users', (req, res) => {
     UserController.getAllUsers(req, res);
 });
