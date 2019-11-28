@@ -3,6 +3,25 @@ const Response = require('../api/response');
 
 module.exports = class OrderController {
 
+    static getAllOrdersSorted(req, res) {
+        try {
+            let page = req.query.page && req.query.page > 0 ? parseInt(req.query.page) : 1;
+            let max = req.query.max && req.query.max > 0 ? parseInt(req.query.max) : 10;
+            let sort = req.query.sort && req.query.sort !== '' ? req.query.sort : 'created';
+            let asc = req.query.asc && req.query.asc === 'true';
+
+            Order.getAllSorted((err, orders, pages) => {
+                if(err) {
+                    res.send(Response.makeResponse(false, err.toString()));
+                } else {
+                    res.send(Response.makeResponse(true, `Got all orders page ${page}`, orders, pages));
+                }
+            }, page, max, sort, asc);
+        } catch (e) {
+            res.send(Response.makeResponse(false, e.toString()));
+        }
+    }
+
     static getUserSales(req, res) {
         try {
             let userId = req.params.id;
