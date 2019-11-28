@@ -10,6 +10,20 @@ module.exports = class Order extends Model {
         return "Orders";
     }
 
+    static getAllSaleStats(callback) {
+        const db = require('../db/database');
+
+        let query = "select sum(quantity) as totalUnitsSold, sum(totalCost) as totalRevenues, ((select (coalesce(sum(o1.totalCost)) * 0.03) from (select Orders.totalCost from Orders order by created asc limit 0, 10) o1) + (select (coalesce(sum(o2.totalCost),0) * 0.08) from (select Orders.totalCost from Orders order by created asc limit 10, 18446744073709551615) o2)) as commission from Orders";
+
+        db.query(query, [], (err, results) => {
+            if(err) {
+                callback(err, null);
+            } else {
+                callback(null, results);
+            }
+        });
+    }
+
     static getSalesByUser(userId, callback, dryRun = false) {
         const db = require('../db/database');
 

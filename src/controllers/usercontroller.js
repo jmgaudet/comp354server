@@ -9,6 +9,20 @@ const sparkPostTransport = require('nodemailer-sparkpost-transport');
 
 module.exports = class UserController {
 
+    static getAdminStats(req, res) {
+        try {
+            Order.getAllSaleStats((err, stats) => {
+                if(err) {
+                    res.send(Response.makeResponse(false, err.toString()));
+                } else {
+                    res.send(Response.makeResponse(true, "Got admin stats", stats));
+                }
+            });
+        }catch(e) {
+            res.send(Response.makeResponse(false, e.toString()));
+        }
+    }
+
     static getSellerStats(req, res) {
         try {
             let userId = req.params.id;
@@ -17,10 +31,11 @@ module.exports = class UserController {
                 if(err) {
                     res.send(Response.makeResponse(false, err.toString()));
                 } else {
-                    let totalSold = orders.length;
+                    let totalSold = 0;
                     let totalRevenue = 0;
 
                     orders.forEach((order) => {
+                        totalSold += order.quantity;
                         totalRevenue += order.totalCost;
                     });
 
