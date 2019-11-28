@@ -1,4 +1,5 @@
 const Model = require('./model.js');
+const Product = require('./product.js');
 
 module.exports = class Order extends Model {
 
@@ -8,6 +9,31 @@ module.exports = class Order extends Model {
 
     static getTable() {
         return "Orders";
+    }
+
+    static getAllSorted(callback, page = 1, max = 20, orderColumn = 'created', asc = true) {
+        const db = require('../db/database');
+
+        db.query("select count(*) as count from ??", [Order.getTable()], (err, results) => {
+            if(err) {
+                callback(err);
+            }
+            let count = results[0].count;
+            let pageCount = Math.ceil(count/max);
+            let start = (page - 1) * max;
+
+            let query = `select o.*, p.name as productName from ?? o left join ?? p on p.id = o.productId
+                    order by ?? ${asc ? 'ASC' : 'DESC'} limit ?,?`;
+            let params = [Order.getTable(), Product.getTable(), orderColumn, start, max];
+
+            db.query(query, params, (err, orders) => {
+                if(err) {
+                    callback(err);
+                }
+                callback(null, orders, pageCount);
+            });
+        });
+
     }
 
     static getAllSaleStats(callback) {

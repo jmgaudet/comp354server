@@ -90,6 +90,10 @@ app.get('/admin/stats', (req, res) => {
     UserController.getAdminStats(req, res);
 });
 
+app.get('/orders', (req, res) => {
+    OrderController.getAllOrdersSorted(req, res);
+});
+
 /*~~~~~~~~~~~~ User routes ~~~~~~~~~~~~*/
 
 app.get('/users/:id/stats', (req, res) => {
