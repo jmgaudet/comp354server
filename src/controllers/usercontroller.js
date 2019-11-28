@@ -62,13 +62,13 @@ module.exports = class UserController {
             let page = req.query.page && req.query.page > 0 ? parseInt(req.query.page) : 1;
             let max = req.query.max && req.query.max > 0 ? parseInt(req.query.max) : 10;
 
-            User.getAll((err, users) => {
+            User.getAll((err, users, pageCount) => {
                 if (err) {
                     res.send(Response.makeResponse(false, err.toString()));
                     return;
                 }
 
-                res.send(Response.makeResponse(true, 'Got users', users));
+                res.send(Response.makeResponse(true, 'Got users', users, pageCount));
             }, page, max);
         } catch (e) {
             res.send(Response.makeResponse(false, e.toString()));

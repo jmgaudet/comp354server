@@ -113,24 +113,33 @@ module.exports = class Model {
     static getAll(callback, page = 1, resultsPerPage = 20, dryRun = false) {
         const db = require('../db/database');
 
-        let start = (page - 1) * resultsPerPage;
-        const query = 'select * from ?? limit ?,?';
-        const params = [this.getTable(), start, resultsPerPage];
-
-        if (!dryRun) db.query(query, params, (err, res) => {
-            if (err) {
+        db.query("select count(*) as count from ??", [this.getTable()], (err, results) => {
+            if(err) {
                 callback(err, null);
             } else {
-                let r = [];
-                res.forEach((obj) => {
-                    let model = new this(obj);
-                    r.push(model);
+
+                let count = results[0].count;
+                let pageCount = Math.ceil(count/resultsPerPage);
+                let start = (page - 1) * resultsPerPage;
+                const query = 'select * from ?? limit ?,?';
+                const params = [this.getTable(), start, resultsPerPage];
+
+                if (!dryRun) db.query(query, params, (err, res) => {
+                    if (err) {
+                        callback(err, null);
+                    } else {
+                        let r = [];
+                        res.forEach((obj) => {
+                            let model = new this(obj);
+                            r.push(model);
+                        });
+                        callback(null, r, pageCount);
+                    }
                 });
-                callback(null, r);
             }
         });
 
-        return db.format(query, params);
+        return "";
     }
 
     /**
