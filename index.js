@@ -133,6 +133,11 @@ app.post('/login/', profileImageUploads.none(), (req, res) => {
     UserController.userAuth(req, res);
 });
 
+//send welcome email after sign up
+app.post('/welcome/', profileImageUploads.none(), (req, res) => {
+    UserController.signUpEmail(req, res);
+});
+
 app.post('/passwordreset/', profileImageUploads.none(), (req, res) => {
     UserController.passReset(req, res);
 });
