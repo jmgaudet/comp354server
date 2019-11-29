@@ -54,11 +54,12 @@ module.exports = class Order extends Model {
         const db = require('../db/database');
 
         const query = `SELECT Orders.*, Users.firstName, Users.lastName, Products.name 
-            FROM Orders JOIN Users 
-            ON Orders.sellerId = Users.id
+            FROM ?? 
+            JOIN Users 
+                ON Orders.buyerId = Users.id
             JOIN Products
-            ON Orders.productId = Products.id
-            WHERE Orders.sellerId = 136
+                ON Orders.productId = Products.id
+            WHERE Orders.sellerId = ?
             ORDER BY Orders.id ASC;`
 
         // const query = 'select * from ?? where `sellerId` = ?';
