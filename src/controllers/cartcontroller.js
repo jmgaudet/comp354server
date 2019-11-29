@@ -141,6 +141,8 @@ module.exports = class CartController {
         try {
             let userId = req.params.id;
             let quantity = req.body.quantity;
+            let productId = req.body.productId;
+
 
 
         } catch (e) {

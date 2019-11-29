@@ -78,9 +78,9 @@ module.exports = class OrderController {
                             }
                             // Have to recheck that the item did not run out of stock while it was sitting in the user's cart
                             if (prod.quantity < item.quantity) {
-                                let message = `Check product "quantity": The quantity you are trying to order 
-                                    (${item.quantity}) is greater than the product stock (${prod.quantity})`;
-                                res.send(Response.makeResponse(false, message, prod));
+                                // let message = `Check product "quantity": The quantity you are trying to order
+                                //     (${item.quantity}) is greater than the product stock (${prod.quantity})`;
+                                // res.send(Response.makeResponse(false, message, prod));
                                 return;
                             }
 

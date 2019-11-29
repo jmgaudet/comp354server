@@ -15,11 +15,11 @@ module.exports = class Order extends Model {
         const db = require('../db/database');
 
         db.query("select count(*) as count from ??", [Order.getTable()], (err, results) => {
-            if(err) {
+            if (err) {
                 callback(err);
             }
             let count = results[0].count;
-            let pageCount = Math.ceil(count/max);
+            let pageCount = Math.ceil(count / max);
             let start = (page - 1) * max;
 
             let query = `select o.*, p.name as productName from ?? o left join ?? p on p.id = o.productId
@@ -27,7 +27,7 @@ module.exports = class Order extends Model {
             let params = [Order.getTable(), Product.getTable(), orderColumn, start, max];
 
             db.query(query, params, (err, orders) => {
-                if(err) {
+                if (err) {
                     callback(err);
                 }
                 callback(null, orders, pageCount);
@@ -42,7 +42,7 @@ module.exports = class Order extends Model {
         let query = "select sum(quantity) as totalUnitsSold, sum(totalCost) as totalRevenues, ((select (coalesce(sum(o1.totalCost)) * 0.03) from (select Orders.totalCost from Orders order by created asc limit 0, 10) o1) + (select (coalesce(sum(o2.totalCost),0) * 0.08) from (select Orders.totalCost from Orders order by created asc limit 10, 18446744073709551615) o2)) as commission from Orders";
 
         db.query(query, [], (err, results) => {
-            if(err) {
+            if (err) {
                 callback(err, null);
             } else {
                 callback(null, results);
@@ -53,7 +53,15 @@ module.exports = class Order extends Model {
     static getSalesByUser(userId, callback, dryRun = false) {
         const db = require('../db/database');
 
-        const query = 'select * from ?? where `sellerId` = ?';
+        const query = `SELECT Orders.*, Users.firstName, Users.lastName, Products.name 
+            FROM Orders JOIN Users 
+            ON Orders.sellerId = Users.id
+            JOIN Products
+            ON Orders.productId = Products.id
+            WHERE Orders.sellerId = 136
+            ORDER BY Orders.id ASC;`
+
+        // const query = 'select * from ?? where `sellerId` = ?';
         const params = [Order.getTable(), userId];
 
         if (!dryRun) db.query(query, params, (err, results) => {
