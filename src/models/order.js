@@ -32,6 +32,31 @@ module.exports = class Order extends Model {
         return db.format(query, params);
     }
 
+
+
+    static getOrderByIDByTime(userId,time, callback, dryRun = false) {
+        const db = require('../db/database');
+
+        const query ='select productId , quantity from ?? where `sellerId` = ? and `created` = ?';
+        const params = [Order.getTable(), userId,time];
+
+        if (!dryRun) db.query(query, params, (err, results) => {
+            if (err) {
+                callback(err, null);
+            } else {
+                let r = [];
+                results.forEach((obj) => {
+                    let model = new this(obj);
+                    r.push(model);
+                });
+                callback(null, r);
+            }
+        });
+
+        return db.format(query, params);
+    }
+
+
     // getUserTotalOnDate
 
     // getTotalForWholeWebsite
