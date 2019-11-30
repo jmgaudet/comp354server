@@ -1,5 +1,6 @@
 const Model = require('./model.js');
 const Product = require('./product.js');
+const User = require('./user.js');
 
 module.exports = class Order extends Model {
 
@@ -22,9 +23,12 @@ module.exports = class Order extends Model {
             let pageCount = Math.ceil(count / max);
             let start = (page - 1) * max;
 
-            let query = `select o.*, p.name as productName from ?? o left join ?? p on p.id = o.productId
-                    order by ?? ${asc ? 'ASC' : 'DESC'} limit ?,?`;
-            let params = [Order.getTable(), Product.getTable(), orderColumn, start, max];
+            let query = `select o.*, p.name as productName, u.firstName, u.lastName
+                from ?? o 
+                left join ?? p on p.id = o.productId
+                left join ?? u on u.id = o.buyerId
+                order by ?? ${asc ? 'ASC' : 'DESC'} limit ?,?`;
+            let params = [Order.getTable(), Product.getTable(), User.getTable(), orderColumn, start, max];
 
             db.query(query, params, (err, orders) => {
                 if (err) {
