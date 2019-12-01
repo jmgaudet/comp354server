@@ -1,5 +1,6 @@
 require('dotenv').config();
 const User = require('../models/user');
+const Order = require('../models/order');
 const Response = require('../api/response');
 const bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');
@@ -8,6 +9,49 @@ const sparkPostTransport = require('nodemailer-sparkpost-transport');
 
 module.exports = class UserController {
 
+    static getAdminStats(req, res) {
+        try {
+            Order.getAllSaleStats((err, stats) => {
+                if(err) {
+                    res.send(Response.makeResponse(false, err.toString()));
+                } else {
+                    res.send(Response.makeResponse(true, "Got admin stats", stats));
+                }
+            });
+        }catch(e) {
+            res.send(Response.makeResponse(false, e.toString()));
+        }
+    }
+
+    static getSellerStats(req, res) {
+        try {
+            let userId = req.params.id;
+
+            Order.getSalesByUser(userId, (err, orders) => {
+                if(err) {
+                    res.send(Response.makeResponse(false, err.toString()));
+                } else {
+                    let totalSold = 0;
+                    let totalRevenue = 0;
+
+                    orders.forEach((order) => {
+                        totalSold += order.quantity;
+                        totalRevenue += order.totalCost;
+                    });
+
+                    let stats = {
+                        totalUnits: totalSold,
+                        totalRevenue: totalRevenue
+                    };
+
+                    res.send(Response.makeResponse(true, "Got sale stats", stats));
+                }
+            });
+        }catch (e) {
+            res.send(Response.makeResponse(false, e.toString()));
+        }
+    }
+
     /**
      * Returns all users currently in the database
      * @param req
@@ -15,14 +59,17 @@ module.exports = class UserController {
      */
     static getAllUsers(req, res) {
         try {
-            User.getAll((err, users) => {
+            let page = req.query.page && req.query.page > 0 ? parseInt(req.query.page) : 1;
+            let max = req.query.max && req.query.max > 0 ? parseInt(req.query.max) : 10;
+
+            User.getAll((err, users, pageCount) => {
                 if (err) {
                     res.send(Response.makeResponse(false, err.toString()));
                     return;
                 }
 
-                res.send(Response.makeResponse(true, 'Got users', users));
-            })
+                res.send(Response.makeResponse(true, 'Got users', users, pageCount));
+            }, page, max);
         } catch (e) {
             res.send(Response.makeResponse(false, e.toString()));
         }
@@ -65,14 +112,14 @@ module.exports = class UserController {
 
                 bcrypt.hash(validUser.password, 10, (err, hash) => {
                     validUser.password = hash;
-                    validUser.save((err, updated) => {
+                    validUser.save((err, createdUser) => {
                         if (err) {
                             res.send(Response.makeResponse(false, err.toString()));
                             return;
                         }
-                        let success = !!updated;
+                        let success = !!createdUser;
                         let message = success ? 'User created' : 'User not created';
-                        res.send(Response.makeResponse(success, message, updated));
+                        res.send(Response.makeResponse(success, message, createdUser));
                     });
                 });
             });
@@ -83,6 +130,8 @@ module.exports = class UserController {
 
     static updateUserPassword(req, res) {
         try {
+            let currentPassword = req.body.currentPassword;
+            let newPassword = req.body.newPassword;
             User.validateNewPassword(req, (err, value) => {
                 if (err) {
                     res.send(Response.makeResponse(false, err.toString()));
@@ -93,17 +142,30 @@ module.exports = class UserController {
                         res.send(Response.makeResponse(false, err.toString()));
                         return;
                     }
-                    foundUser.password = value.password;
-                    foundUser.save((err, updated) => {
-                        if (err) {
-                            res.send(Response.makeResponse(false, err.toString()));
-                            return;
-                        }
-                        let success = !!updated;
-                        let message = success ? 'User password updated' : 'User password not updated';
+                    bcrypt.compare(value.currentPassword, foundUser.password, function (err, res1) {
+                        if (res1) {
+                            bcrypt.hash(value.newPassword, 10, (err, hashedNewPassword) => {
+                                if (err)
+                                    res.send(Response.makeResponse(false, err.toString()));
+                                else {
+                                    foundUser.password = hashedNewPassword;
+                                    foundUser.save((err, updated) => {
+                                        if (err) {
+                                            res.send(Response.makeResponse(false, err.toString()));
+                                            return;
+                                        }
+                                        let success = !!updated;
+                                        let message = success ? 'User password updated' : 'User password not updated';
 
-                        res.send(Response.makeResponse(success, message, updated));
-                    }, true);
+                                        res.send(Response.makeResponse(success, message, updated));
+                                    }, true);
+                                }
+                            });
+                        } else {
+                            res.send(Response.makeResponse(false, `"currentPassword" does not match database.`));
+                        }
+                    });
+                    foundUser.password = value.password;
                 });
             });
         } catch (e) {
@@ -242,14 +304,19 @@ module.exports = class UserController {
                     res.send(Response.makeResponse(false, err.toString()));
                     return;
                 }
+                if (err) {
+                    res.send(Response.makeResponse(false, err.toString()));
+                    return;
+                }
+                let message = '';
+                if (reviews[0] == undefined) {
+                    message = 'No reviews yet';
+                    reviews = [{'rate': 'N/A'}]
+                } else {
+                    message = 'Received reviews';
 
-                let found = !!reviews;
-                let message = found ? 'Received reviews' : 'No reviews yet';
-
-                if (found) {
-                    res.send(Response.makeResponse(found, message, reviews));
-                } else
-                    res.send(Response.makeResponse(found, message));
+                }
+                res.send(Response.makeResponse(true, message, reviews));
             })
         } catch (e) {
 
@@ -257,6 +324,30 @@ module.exports = class UserController {
         }
     }
 
+    static getRatingBySeller(req, res) {
+        try {
+            let id = req.params.id;
+            User.getRatingBySeller(id, (err, reviews) => {
+                if (err) {
+                    res.send(Response.makeResponse(false, err.toString()));
+                    return;
+                }
+                let message = '';
+                if (reviews[0] == undefined) {
+                    message = 'No reviews yet';
+                    reviews = [{'rate': 'N/A'}]
+                } else {
+                    message = 'Received reviews';
+
+                }
+
+                res.send(Response.makeResponse(true, message, reviews));
+            })
+        } catch (e) {
+
+            res.send(Response.makeResponse(false, e.toString()));
+        }
+    }
 
     //Sends a new temporary password by email to a client who requests a forgot password
     static passReset(req, res) {
@@ -299,7 +390,7 @@ module.exports = class UserController {
                                         to: '354testerlinda@gmail.com', //TODO: this is a temporary testing email account to receive the forgot password emails
                                         //to: user.email,               //TODO: once users have actual associated emails, we could use this
                                         subject: 'New Temporary Password for 354TheStars Website',
-                                        html: 'Hello,<br></br><br>Here is your new password: </br>' +
+                                        html: 'Hello ' + user.firstName + ' ' + user.lastName + ',<br></br><br>Here is your new password: </br>' +
                                             newPassW + '<br></br><br></br>' +
                                             'Please make sure to change it once you login with this password.<br></br><br></br>' +
                                             'Thank you,<br></br><br></br>354TheStars Team'

@@ -11,6 +11,33 @@ const Response = require('../api/response');
  */
 module.exports = class ProductController {
 
+    static updateProductDetails(req, res) {
+        try {
+            let productId = req.params.id;
+
+            Product.fromId(productId, (err, product) => {
+                if(err) {
+                    res.send(Response.makeResponse(false, err.toString()));
+                } else {
+                    product.name = req.body.name ? req.body.name : product.name;
+                    product.price = req.body.price ? req.body.price : product.price;
+                    product.quantity = req.body.quantity ? req.body.quantity : product.quantity;
+                    product.description = req.body.description ? req.body.description : product.description;
+
+                    product.save((err,updatedProduct) => {
+                        if(err) {
+                            res.send(Response.makeResponse(false, err.toString()));
+                        } else {
+                            res.send(Response.makeResponse(true, "Product updated", updatedProduct));
+                        }
+                    }, true);
+                }
+            });
+        }catch (e) {
+            res.send(Response.makeResponse(false, e.toString()));
+        }
+    }
+
     static getAllForUser(req, res) {
         try {
             let page = req.query.page && req.query.page > 0 ? parseInt(req.query.page) : 1;

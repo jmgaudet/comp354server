@@ -82,8 +82,23 @@ app.get('/users/:userId/products', (req, res) => {
     ProductController.getAllForUser(req, res);
 });
 
+app.put('/products/:id/details', productImageUploads.none(), (req, res) => {
+    ProductController.updateProductDetails(req, res);
+});
+
+app.get('/admin/stats', (req, res) => {
+    UserController.getAdminStats(req, res);
+});
+
+app.get('/orders', (req, res) => {
+    OrderController.getAllOrdersSorted(req, res);
+});
 
 /*~~~~~~~~~~~~ User routes ~~~~~~~~~~~~*/
+
+app.get('/users/:id/stats', (req, res) => {
+    UserController.getSellerStats(req, res);
+});
 
 app.get('/users', (req, res) => {
     UserController.getAllUsers(req, res);
@@ -146,7 +161,26 @@ app.get('/ratings/:id/', (req, res) => {
     RatingController.getRating(req, res);
 });
 
+app.get('/seller/:id/ratings', (req, res) => {
+    UserController.getRatingBySeller(req, res);
+});
 
+app.post('/ratings', (req,res) =>{
+    RatingController.addRating(req,res);
+});
+
+app.put('/ratings/:id/', (req,res) =>{
+    RatingController.updateRatingBySeller(req,res);
+});
+
+
+app.put('/ratings/user/:id/', (req,res) =>{
+    RatingController.updateRatingByBuyer(req,res);
+});
+
+app.delete('/ratings/:id/', (req,res)=>{
+   RatingController.deleteRating(req,res); 
+});
 /*~~~~~~~~~~~~ Cart routes ~~~~~~~~~~~~*/
 
 app.get('/users/:id/cart', (req, res) => {
@@ -170,6 +204,10 @@ app.put('/users/:id/cart', (req, res) => {
 
 app.get('/users/:id/orders', (req, res) => {
     OrderController.getUserOrders(req, res);
+});
+
+app.get('/users/:id/sales', (req, res) => {
+    OrderController.getUserSales(req, res);
 });
 
 app.post('/users/:id/orders', (req, res) => {

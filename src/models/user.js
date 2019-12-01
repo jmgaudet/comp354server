@@ -51,7 +51,8 @@ module.exports = class User extends Model {
     static validateNewPassword(req, callback) {
 
         const schema = Joi.object().keys({
-            password: Joi.string().min(8).required(),
+            currentPassword: Joi.string().required(),
+            newPassword: Joi.string().min(8).required()
         });
 
         const {error, value} = schema.validate(req.body);
@@ -93,7 +94,20 @@ module.exports = class User extends Model {
         });
         return db.format(query, params);
     }
+    static getRatingBySeller(id,callback,dryrun=false) {
+        const db = require('../db/database');
 
+        let params = [Rating.getTable(), id];
+        const query = 'select Rating.*, Users.firstName, Users.lastName from ?? JOIN Users ON Rating.userId = Users.id where `sellerId` = ? ';
+        if (!dryrun) db.query(query, params, (err, results) => {
+            if (err) {
+                callback(err);
+            } else {
+                callback(null, results);
+            }
+        });
+        return db.format(query, params);
+    }
     toJson() {
         return {
             id: this.id,

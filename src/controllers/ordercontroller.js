@@ -10,6 +10,39 @@ const Product = require('../models/product.js');
 
 module.exports = class OrderController {
 
+    static getAllOrdersSorted(req, res) {
+        try {
+            let page = req.query.page && req.query.page > 0 ? parseInt(req.query.page) : 1;
+            let max = req.query.max && req.query.max > 0 ? parseInt(req.query.max) : 10;
+            let sort = req.query.sort && req.query.sort !== '' ? req.query.sort : 'created';
+            let asc = req.query.asc && req.query.asc === 'true';
+
+            Order.getAllSorted((err, orders, pages) => {
+                if(err) {
+                    res.send(Response.makeResponse(false, err.toString()));
+                } else {
+                    res.send(Response.makeResponse(true, `Got all orders page ${page}`, orders, pages));
+                }
+            }, page, max, sort, asc);
+        } catch (e) {
+            res.send(Response.makeResponse(false, e.toString()));
+        }
+    }
+
+    static getUserSales(req, res) {
+        try {
+            let userId = req.params.id;
+            Order.getSalesByUser(userId, (err, orders) => {
+                if (err) {
+                    res.send(Response.makeResponse(false, err.toString()));
+                    return;
+                }
+                res.send(Response.makeResponse(true, "Got user sales", orders));
+            });
+        } catch (e) {
+            res.send(Response.makeResponse(false, e.toString()));
+        }
+    }
 
     static createOrder(req, res) {
         try {
@@ -59,9 +92,9 @@ module.exports = class OrderController {
                             }
                             // Have to recheck that the item did not run out of stock while it was sitting in the user's cart
                             if (prod.quantity < item.quantity) {
-                                let message = `Check product "quantity": The quantity you are trying to order 
-                                    (${item.quantity}) is greater than the product stock (${prod.quantity})`;
-                                res.send(Response.makeResponse(false, message, prod));
+                                // let message = `Check product "quantity": The quantity you are trying to order
+                                //     (${item.quantity}) is greater than the product stock (${prod.quantity})`;
+                                // res.send(Response.makeResponse(false, message, prod));
                                 return;
                             }
 
@@ -121,9 +154,7 @@ module.exports = class OrderController {
                     res.send(Response.makeResponse(false, err.toString()));
                     return;
                 }
-                let success = !!orders[0];  // orders is always an array -- have to be more specific
-                let message = success ? `Got user's orders with user id ${userId}` : `Could not get user's orders`;
-                res.send(Response.makeResponse(success, message, orders));
+                res.send(Response.makeResponse(true, "Got user orders", orders));
             });
         } catch (e) {
             res.send(Response.makeResponse(false, e.toString()));
