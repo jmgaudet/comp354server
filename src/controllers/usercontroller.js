@@ -390,7 +390,7 @@ module.exports = class UserController {
                                         to: '354testerlinda@gmail.com', //TODO: this is a temporary testing email account to receive the forgot password emails
                                         //to: user.email,               //TODO: once users have actual associated emails, we could use this
                                         subject: 'New Temporary Password for 354TheStars Website',
-                                        html: 'Hello,<br></br><br>Here is your new password: </br>' +
+                                        html: 'Hello ' + user.firstName + ' ' + user.lastName + ',<br></br><br>Here is your new password: </br>' +
                                             newPassW + '<br></br><br></br>' +
                                             'Please make sure to change it once you login with this password.<br></br><br></br>' +
                                             'Thank you,<br></br><br></br>354TheStars Team'
