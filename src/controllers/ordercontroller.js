@@ -52,14 +52,14 @@ module.exports = class OrderController {
             const order = new Order;
             let jsonOrderSummary = [];
 
-            let orderTime = order.created
-            let timeOrder = new Date(orderTime);
-            let d = new Date(orderTime);
-            d = (d.getTimezoneOffset() * 60000);
-            timeOrder = timeOrder - d;
-            var time = new Date(timeOrder)
-            time = time.toISOString();
-            time =time.slice(0, 19).replace('T', ' ');
+            // let orderTime = order.created
+            // let timeOrder = new Date(orderTime);
+            // let d = new Date(orderTime);
+            // d = (d.getTimezoneOffset() * 60000);
+            // timeOrder = timeOrder - d;
+            // var time = new Date(timeOrder)
+            // time = time.toISOString();
+            // time =time.slice(0, 19).replace('T', ' ');
 
 
             order.shippingAddress = req.body.shippingAddress;
@@ -129,7 +129,7 @@ module.exports = class OrderController {
                                             // console.log('The last iteration!');
 
                                             // console.log(time);
-                                            this.emailOrder(jsonOrderSummary,name,lastname,email,res,time)
+                                            this.emailOrder(jsonOrderSummary,name,lastname,email,res)
 
                                             // res.send(Response.makeResponse(true, "Order placed", jsonOrderSummary));
                                         }
@@ -163,7 +163,7 @@ module.exports = class OrderController {
 
 
         //function to prepare data for the purchase confirm email
-    static emailOrder(jsonOrderSummary,firstName,LastName,email,res,time){
+    static emailOrder(jsonOrderSummary,firstName,LastName,email,res){
 
                     const Product = require('../models/product.js');
                     //get complete order
@@ -171,6 +171,7 @@ module.exports = class OrderController {
                     let totalPrice = 0;
                     let orderSum ='';
                     let sellerIDs = [];
+                    let orderIDs =[];
                     jsonOrderSummary.forEach((item,index,array) => {
                         let  id = item.productId;
                         let cost = 0;
@@ -182,6 +183,7 @@ module.exports = class OrderController {
                                 return;
                             }
                             sellerIDs.push(item.sellerId);
+                            orderIDs.push(item.id);
                             amount = item.quantity
                             name = prod.name
                             cost = prod.price
@@ -189,7 +191,7 @@ module.exports = class OrderController {
                             totalPrice = totalPrice + parseInt(cost);
                             if (index === jsonOrderSummary.length - 1){
 
-                                this.sellerEmail(sellerIDs, time,res,jsonOrderSummary,firstName,LastName,orderSum,totalPrice);
+                                this.sellerEmail(sellerIDs,res,jsonOrderSummary,firstName,LastName,orderSum,totalPrice,orderIDs);
                                 // this.sendBuyerEmail(firstName,LastName,orderSum,totalPrice,jsonOrderSummary,email,sellerIDs,time,res);
 
 
@@ -242,24 +244,53 @@ module.exports = class OrderController {
 
 
 
-    static sellerEmail(sellerIDs, timeCreated,res,jsonOrderSummary,firstName,LastName,orderSum,totalPrice) {
+    static sellerEmail(sellerIDs,res,jsonOrderSummary,firstName,LastName,orderSum,totalPrice,orderIDs) {
 
 
         const transporter = nodemailer.createTransport(sparkPostTransport({
             sparkPostApiKey: process.env.SPARKPOST_API_KEY
         }));
-        console.log(timeCreated);
+      ;
         function onlyUnique(value, index, self) {return self.indexOf(value) === index;}
         var sellers = sellerIDs.filter(onlyUnique);
-
+        let timeCreated = ''
         console.log(sellers)
 
         let quantities = []
         let productIDS =[]
         let sellerInfo
+        let orders = orderIDs[0];
+        console.log(orders);
 
         async.waterfall([
-           function  getOrder (callback) {
+            function getTime(callback){
+
+            Order.getOrderByOrderID(orders,(err,timeFromOrder)=>{
+                if (err) {
+                    res.send(Response.makeResponse(false, err.toString()));
+                }
+                console.log("gettime function")
+                console.log(timeFromOrder[0].created);
+
+
+                let orderTime = timeFromOrder[0].created;
+                let timeOrder = new Date(orderTime);
+                let d = new Date(orderTime);
+                d = (d.getTimezoneOffset() * 60000);
+                timeOrder = timeOrder - d;
+                let time = new Date(timeOrder);
+                timeCreated = time.toISOString();
+                timeCreated =timeCreated.slice(0, 19).replace('T', ' ');
+                console.log(timeCreated);
+
+
+                callback(null,timeFromOrder);
+                });
+
+            },
+
+
+           function  getOrder (arg1,callback) {
                     Order.getOrderByIDByTime(sellers, timeCreated, (err, order) => {
                         if (err) {
                             res.send(Response.makeResponse(false, err.toString()));
@@ -275,7 +306,7 @@ module.exports = class OrderController {
                     });
 
                 },
-            function getUsers(arg1,callback) {
+            function getUsers(arg2,callback) {
             console.log("getting users");
             console.log(productIDS);
 
@@ -335,19 +366,22 @@ module.exports = class OrderController {
                                 res.send(Response.makeResponse(false, err.toString()));
                             }
 
-                            callback(null,info);
+                            callback(info);
+
+
                         });
+
                     }
 
                 });
 
+
                 }
+
     ],
             function (err, result) {
 
-
-
-
+                // res.send(Response.makeResponse(true, 'buyer and seller emails sent, buyer summary',jsonOrderSummary));
         });
 
         const transporter2 = nodemailer.createTransport(sparkPostTransport({

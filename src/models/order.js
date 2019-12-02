@@ -162,6 +162,28 @@ module.exports = class Order extends Model {
         return db.format(query, params);
     }
 
+    static getOrderByOrderID(orderId, callback, dryRun = false) {
+        const db = require('../db/database');
+
+        const query = 'select * from ?? where `id` = ?';
+        const params = [Order.getTable(), orderId];
+
+        if (!dryRun) db.query(query, params, (err, results) => {
+            if (err) {
+                callback(err, null);
+            } else {
+                let r = [];
+                results.forEach((obj) => {
+                    let model = new this(obj);
+                    r.push(model);
+                });
+                callback(null, r);
+            }
+        });
+
+        return db.format(query, params);
+    }
+
 
 
 
