@@ -195,7 +195,7 @@ app.post('/users/:id/cart', (req, res) => {
     CartController.addToCart(req, res);
 });
 
-app.put('/users/:id/cart', (req, res) => {
+app.put('/cart/:id', (req, res) => {
     CartController.updateQuantity(req, res);
 });
 
