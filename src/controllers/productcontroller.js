@@ -23,6 +23,7 @@ module.exports = class ProductController {
                     product.price = req.body.price ? req.body.price : product.price;
                     product.quantity = req.body.quantity ? req.body.quantity : product.quantity;
                     product.description = req.body.description ? req.body.description : product.description;
+                    product.isFeatured = req.body.isFeatured ? req.body.isFeatured : product.isFeatured;
 
                     product.save((err,updatedProduct) => {
                         if(err) {

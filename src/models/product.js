@@ -75,6 +75,7 @@ module.exports = class Product extends Model{
                         ProductsImages i ON i.productId = p.id
                             LEFT JOIN
                         Categories c ON c.id = pc.categoryId
+                    where p.isFeatured = 1
                         group by p.id, c.name
                     order by rand() limit ?`;
         let params = [amount];
@@ -290,6 +291,7 @@ module.exports = class Product extends Model{
             sellerId: this.sellerId,
             manufacturerId: this.manufacturerId,
             description: this.description,
+            isFeatured: this.isFeatured,
             created: this.created,
         }
     }
