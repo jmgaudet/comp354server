@@ -26,7 +26,7 @@ module.exports = class User extends Model {
             firstName: Joi.string().pattern(/^[A-zÀ-ú\-]{2,30}$/).required(),
             lastName: Joi.string().pattern(/^[A-zÀ-ú\-]{2,30}$/).required(),
             primaryAddress: Joi.string().required(),
-            alternateAddress: Joi.string(),
+            alternateAddress: Joi.string().allow(''),
             email: Joi.string().email({minDomainSegments: 2, tlds: {allow: ['com', 'net']}}).required()
         });
 
@@ -69,7 +69,7 @@ module.exports = class User extends Model {
             firstName: Joi.string().trim().pattern(/^[A-zÀ-ú\-]{2,30}$/),
             lastName: Joi.string().trim().pattern(/^[A-zÀ-ú\-]{2,30}$/),
             primaryAddress: Joi.string().trim(),
-            alternateAddress: Joi.string().trim(),
+            alternateAddress: Joi.string().trim().allow(''),
         });
 
         const {error, value} = schema.validate(req.body);
