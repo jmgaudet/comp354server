@@ -58,6 +58,10 @@ app.get('/products/', (req, res) => {
     ProductController.getAllProducts(req, res);
 });
 
+app.get('/products/featured', (req, res) => {
+    ProductController.getFeaturedProducts(req, res);
+});
+
 app.get('/products/:id/', (req, res) => {
     ProductController.getProduct(req, res);
 });
@@ -65,6 +69,8 @@ app.get('/products/:id/', (req, res) => {
 app.delete('/products/:id/', (req, res) => {
     ProductController.deleteProduct(req, res);
 });
+
+
 
 app.post('/products/', productImageUploads.any(), (req, res) => {
 

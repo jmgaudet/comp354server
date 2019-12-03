@@ -38,6 +38,21 @@ module.exports = class ProductController {
         }
     }
 
+    static getFeaturedProducts(req, res) {
+        try {
+            let amount = req.query.amount ? parseInt(req.query.amount) : 5;
+            Product.getFeaturedProducts((err, products) => {
+                if(err) {
+                    res.send(Response.makeResponse(false, err.toString()));
+                } else {
+                    res.send(Response.makeResponse(true, "Got featured products", products));
+                }
+            });
+        } catch (e) {
+            res.send(Response.makeResponse(false, e.toString()));
+        }
+    }
+
     static getAllForUser(req, res) {
         try {
             let page = req.query.page && req.query.page > 0 ? parseInt(req.query.page) : 1;
