@@ -57,6 +57,36 @@ module.exports = class Product extends Model{
 
     }
 
+    static getFeaturedProducts(callback, amount = 5) {
+        const db = require('../db/database');
+
+        let query = `SELECT 
+                        p.*,
+                        c.name AS category,
+                        m.name AS manufacturer,
+                        json_arrayagg(i.url)     AS images
+                    FROM
+                        Products p
+                            LEFT JOIN
+                        ProductsCategories pc ON pc.productId = p.id
+                            LEFT JOIN
+                        Manufacturers m ON m.id = p.manufacturerId
+                            LEFT JOIN
+                        ProductsImages i ON i.productId = p.id
+                            LEFT JOIN
+                        Categories c ON c.id = pc.categoryId
+                        group by p.id, c.name
+                    order by rand() limit ?`;
+        let params = [amount];
+
+        db.query(query, params, (err, products) => {
+            products.forEach((prod) => {
+                prod.images = JSON.parse(prod.images);
+            });
+            callback(null, products);
+        })
+    }
+
     static getAllSorted(callback, search = '', page = 1, max = 20, orderColumn = 'price', asc = true) {
         const db = require('../db/database');
 
