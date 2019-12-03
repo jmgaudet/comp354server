@@ -139,11 +139,21 @@ module.exports = class CartController {
 
     static updateQuantity(req, res) {
         try {
-            let userId = req.params.id;
-            let quantity = req.body.quantity;
-            let productId = req.body.productId;
-
-
+            let cartId = req.params.id;
+            ShoppingCart.fromId(cartId, (err, item) => {
+                if (err) {
+                    res.send(Response.makeResponse(false, err.toString()));
+                    return;
+                }
+                item.quantity = req.body.quantity ? req.body.quantity : item.quantity;
+                item.save((err), updatedItem => {
+                    if (err) {
+                        res.send(Response.makeResponse(false, err.toString()));
+                    } else {
+                        res.send(Response.makeResponse(true, "Item quantity updated", updatedItem));
+                    }
+                }, true);
+            });
 
         } catch (e) {
             res.send(Response.makeResponse(false, e.toString()));
