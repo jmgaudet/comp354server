@@ -242,7 +242,8 @@ module.exports = class OrderController {
 
     }
 
-
+//This function takes the prepared emailed information from emailOrder
+// It then grabs the needed information to send buyer and seller(s) email.
 
     static sellerEmail(sellerIDs,res,jsonOrderSummary,firstName,LastName,orderSum,totalPrice,orderIDs) {
 
@@ -387,7 +388,7 @@ module.exports = class OrderController {
         const transporter2 = nodemailer.createTransport(sparkPostTransport({
             sparkPostApiKey: process.env.SPARKPOST_API_KEY
         }));
-        console.log("234324234342342342343243243243243243");
+
 
         let PurchaseEmail2 = {
             from: 'no-reply@allanpichardo.com',
