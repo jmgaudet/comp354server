@@ -2,7 +2,7 @@ const Model = require('./model.js');
 
 module.exports = class ProductImage extends Model {
 
-    constructor(dbRow){
+    constructor(dbRow) {
         super(dbRow);
     }
 

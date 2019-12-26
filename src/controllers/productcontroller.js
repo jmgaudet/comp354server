@@ -7,7 +7,6 @@ const Response = require('../api/response');
 /**
  * This class encapsulates all the logic of
  * product API functions
- * @type {ProductController}
  */
 module.exports = class ProductController {
 
@@ -16,7 +15,7 @@ module.exports = class ProductController {
             let productId = req.params.id;
 
             Product.fromId(productId, (err, product) => {
-                if(err) {
+                if (err) {
                     res.send(Response.makeResponse(false, err.toString()));
                 } else {
                     product.name = req.body.name ? req.body.name : product.name;
@@ -25,8 +24,8 @@ module.exports = class ProductController {
                     product.description = req.body.description ? req.body.description : product.description;
                     product.isFeatured = req.body.isFeatured ? req.body.isFeatured : product.isFeatured;
 
-                    product.save((err,updatedProduct) => {
-                        if(err) {
+                    product.save((err, updatedProduct) => {
+                        if (err) {
                             res.send(Response.makeResponse(false, err.toString()));
                         } else {
                             res.send(Response.makeResponse(true, "Product updated", updatedProduct));
@@ -34,7 +33,7 @@ module.exports = class ProductController {
                     }, true);
                 }
             });
-        }catch (e) {
+        } catch (e) {
             res.send(Response.makeResponse(false, e.toString()));
         }
     }
@@ -43,7 +42,7 @@ module.exports = class ProductController {
         try {
             let amount = req.query.amount ? parseInt(req.query.amount) : 5;
             Product.getFeaturedProducts((err, products) => {
-                if(err) {
+                if (err) {
                     res.send(Response.makeResponse(false, err.toString()));
                 } else {
                     res.send(Response.makeResponse(true, "Got featured products", products));
@@ -64,11 +63,11 @@ module.exports = class ProductController {
             let productId = req.params.id;
 
             User.fromId(userId, (err, user) => {
-                if(err) {
+                if (err) {
                     res.send(Response.makeResponse(false, err.toString()));
                 } else {
                     Product.getAllByUserSorted((err, products, pageCount) => {
-                        if(err) {
+                        if (err) {
                             res.send(Response.makeResponse(false, err.toString()));
                         } else {
                             res.send(Response.makeResponse(true, 'All products for user', products, pageCount))
@@ -76,7 +75,7 @@ module.exports = class ProductController {
                     }, userId, page, max, sort, asc);
                 }
             });
-        }catch (e) {
+        } catch (e) {
             res.send(Response.makeResponse(false, e.toString()));
         }
     }
@@ -87,7 +86,7 @@ module.exports = class ProductController {
      * @param res
      */
     static getAllProducts(req, res) {
-        try{
+        try {
             let page = req.query.page && req.query.page > 0 ? parseInt(req.query.page) : 1;
             let max = req.query.max && req.query.max > 0 ? parseInt(req.query.max) : 10;
             let sort = req.query.sort && req.query.sort !== '' ? req.query.sort : 'price';
@@ -95,7 +94,7 @@ module.exports = class ProductController {
             let search = req.query.search && req.query.search !== '' ? req.query.search : '';
 
             Product.getAllSorted((err, products, pageCount) => {
-                if(err) {
+                if (err) {
                     res.send(Response.makeResponse(false, err.toString()));
                     return;
                 }
@@ -104,7 +103,7 @@ module.exports = class ProductController {
 
             }, search, page, max, sort, asc);
 
-        }catch (e) {
+        } catch (e) {
             res.send(Response.makeResponse(false, e.toString()));
         }
 
@@ -119,7 +118,7 @@ module.exports = class ProductController {
         try {
             let id = req.params.id;
             Product.fromId(id, (err, product) => {
-                if(err) {
+                if (err) {
                     res.send(Response.makeResponse(false, err.toString()));
                     return;
                 }
@@ -128,7 +127,7 @@ module.exports = class ProductController {
                 // let success = product != null ? true : false;
                 let message = success ? 'Product found' : 'Product not found';
 
-                if(success) {
+                if (success) {
                     product.getCompleteObject((err, json) => {
                         res.send(Response.makeResponse(success, message, json));
                     });
@@ -136,7 +135,7 @@ module.exports = class ProductController {
                     res.send(Response.makeResponse(success, message));
                 }
             });
-        } catch(e) {
+        } catch (e) {
             res.send(Response.makeResponse(false, e.toString()));
         }
     }
@@ -152,14 +151,14 @@ module.exports = class ProductController {
             let max = req.query.max && req.query.max > 0 ? parseInt(req.query.max) : 10;
 
             Category.getAll((err, categories) => {
-                if(err) {
+                if (err) {
                     res.send(Response.makeResponse(false, err.toString()));
                     return;
                 }
 
                 res.send(Response.makeResponse(true, `Got page ${page}`, categories));
             }, page, max);
-        } catch(e) {
+        } catch (e) {
             res.send(Response.makeResponse(false, e.toString()));
         }
     }
@@ -174,14 +173,14 @@ module.exports = class ProductController {
             let id = req.params.id;
 
             Category.fromId(id, (err, category) => {
-                if(err) {
+                if (err) {
                     res.send(Response.makeResponse(false, err.toString()));
                     return;
                 }
 
                 res.send(Response.makeResponse(true, `Got category`, category));
             });
-        }catch (e) {
+        } catch (e) {
             res.send(Response.makeResponse(false, e.toString()));
         }
     }
@@ -192,14 +191,14 @@ module.exports = class ProductController {
             let max = req.query.max && req.query.max > 0 ? parseInt(req.query.max) : 10;
 
             Manufacturer.getAll((err, categories) => {
-                if(err) {
+                if (err) {
                     res.send(Response.makeResponse(false, err.toString()));
                     return;
                 }
 
                 res.send(Response.makeResponse(true, `Got page ${page}`, categories));
             }, page, max);
-        } catch(e) {
+        } catch (e) {
             res.send(Response.makeResponse(false, e.toString()));
         }
     }
@@ -209,14 +208,14 @@ module.exports = class ProductController {
             let id = req.params.id;
 
             Manufacturer.fromId(id, (err, category) => {
-                if(err) {
+                if (err) {
                     res.send(Response.makeResponse(false, err.toString()));
                     return;
                 }
 
                 res.send(Response.makeResponse(true, `Got manufacturer`, category));
             });
-        }catch (e) {
+        } catch (e) {
             res.send(Response.makeResponse(false, e.toString()));
         }
     }
@@ -227,25 +226,25 @@ module.exports = class ProductController {
      * @param res
      */
     static deleteProduct(req, res) {
-        try{
+        try {
             let id = req.params.id;
             Product.fromId(id, (err, product) => {
-                if(err) {
+                if (err) {
                     res.send(Response.makeResponse(false, err.toString()));
                     return;
                 }
                 product.delete((err, success) => {
-                    if(err) {
-                        res.send(Response.makeResponse(false, err.toString()));
-                        return;
-                    }
-                    let message = success ? 'Product deleted' : 'Product not deleted';
+                        if (err) {
+                            res.send(Response.makeResponse(false, err.toString()));
+                            return;
+                        }
+                        let message = success ? 'Product deleted' : 'Product not deleted';
 
-                    res.send(Response.makeResponse(success, message));
+                        res.send(Response.makeResponse(success, message));
                     }
                 )
             });
-        }catch (e) {
+        } catch (e) {
             res.send(Response.makeResponse(false, e.toString()));
         }
 
@@ -253,7 +252,7 @@ module.exports = class ProductController {
 
     static makeCategoryProductLink(req, res, categoryId, product) {
         product.addCategory(categoryId, (err, success) => {
-            if(err) {
+            if (err) {
                 res.send(Response.makeResponse(false, err.toString()));
             } else {
                 product.getCompleteObject((err, json) => {
@@ -266,24 +265,24 @@ module.exports = class ProductController {
     static saveProductForManufacturerId(req, res, manufacturerId, product, imageUrls) {
         product.manufacturerId = manufacturerId;
         product.save((err, p) => {
-            if(err) {
+            if (err) {
                 res.send(Response.makeResponse(false, err.toString()));
             } else {
                 p.addImages(imageUrls, (err, success) => {
-                    if(err) {
+                    if (err) {
                         res.send(Response.makeResponse(false, err.toString()));
                     } else {
                         Category.search('name', req.body.category, (err, cats) => {
-                            if(err) {
+                            if (err) {
                                 res.send(Response.makeResponse(false, err.toString()));
                             } else {
-                                if(cats.length > 0) {
+                                if (cats.length > 0) {
                                     this.makeCategoryProductLink(req, res, cats[0].id, p);
                                 } else {
                                     let category = new Category();
                                     category.name = req.body.category;
                                     category.save((err, c) => {
-                                        if(err) {
+                                        if (err) {
                                             res.send(Response.makeResponse(false, err.toString()));
                                         } else {
                                             this.makeCategoryProductLink(req, res, c.id, p);
@@ -308,16 +307,16 @@ module.exports = class ProductController {
             product.description = req.body.description;
 
             Manufacturer.search('name', req.body.manufacturer, (err, mans) => {
-                if(err) {
+                if (err) {
                     res.send(Response.makeResponse(false, err.toString()));
                 } else {
-                    if(mans.length > 0) {
+                    if (mans.length > 0) {
                         this.saveProductForManufacturerId(req, res, mans[0].id, product, imageUrls);
                     } else {
                         let manufacturer = new Manufacturer();
                         manufacturer.name = req.body.manufacturer;
                         manufacturer.save((err, m) => {
-                            if(err) {
+                            if (err) {
                                 res.send(Response.makeResponse(false, err.toString()));
                             } else {
                                 this.saveProductForManufacturerId(req, res, m.id, product, imageUrls);
@@ -327,7 +326,7 @@ module.exports = class ProductController {
                 }
             });
 
-        } catch(e) {
+        } catch (e) {
             res.send(Response.makeResponse(false, e.toString()));
         }
     }

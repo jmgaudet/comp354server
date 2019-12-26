@@ -71,12 +71,11 @@ app.delete('/products/:id/', (req, res) => {
 });
 
 
-
 app.post('/products/', productImageUploads.any(), (req, res) => {
 
     (async () => {
         let imageUrls = [];
-        for(let i = 0; i < req.files.length; i++) {
+        for (let i = 0; i < req.files.length; i++) {
             let url = await getProductImageUrl(req.files[i].filename, req.files[i].mimetype);
             imageUrls.push(url);
         }
@@ -171,21 +170,21 @@ app.get('/seller/:id/ratings', (req, res) => {
     UserController.getRatingBySeller(req, res);
 });
 
-app.post('/ratings', (req,res) =>{
-    RatingController.addRating(req,res);
+app.post('/ratings', (req, res) => {
+    RatingController.addRating(req, res);
 });
 
-app.put('/ratings/:id/', (req,res) =>{
-    RatingController.updateRatingBySeller(req,res);
+app.put('/ratings/:id/', (req, res) => {
+    RatingController.updateRatingBySeller(req, res);
 });
 
 
-app.put('/ratings/user/:id/', (req,res) =>{
-    RatingController.updateRatingByBuyer(req,res);
+app.put('/ratings/user/:id/', (req, res) => {
+    RatingController.updateRatingByBuyer(req, res);
 });
 
-app.delete('/ratings/:id/', (req,res)=>{
-   RatingController.deleteRating(req,res); 
+app.delete('/ratings/:id/', (req, res) => {
+    RatingController.deleteRating(req, res);
 });
 /*~~~~~~~~~~~~ Cart routes ~~~~~~~~~~~~*/
 

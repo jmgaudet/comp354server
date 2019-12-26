@@ -114,12 +114,12 @@ module.exports = class Model {
         const db = require('../db/database');
 
         db.query("select count(*) as count from ??", [this.getTable()], (err, results) => {
-            if(err) {
+            if (err) {
                 callback(err, null);
             } else {
 
                 let count = results[0].count;
-                let pageCount = Math.ceil(count/resultsPerPage);
+                let pageCount = Math.ceil(count / resultsPerPage);
                 let start = (page - 1) * resultsPerPage;
                 const query = 'select * from ?? limit ?,?';
                 const params = [this.getTable(), start, resultsPerPage];
@@ -140,6 +140,29 @@ module.exports = class Model {
         });
 
         return "";
+    }
+
+    static search(key, value, callback, page = 1, max = 20, sort = key, asc = true, strict = false) {
+        const db = require('../db/database');
+
+        let start = (page - 1) * max;
+        let ascdesc = asc ? 'asc' : 'desc';
+        let v = strict ? value : `%${value}%`;
+        let query = `select * from ?? where ?? COLLATE utf8mb4_general_ci like ? order by ?? ${ascdesc} limit ?,?`;
+        let params = [this.getTable(), key, v, key, start, max];
+
+        db.query(query, params, (err, results) => {
+            if (err) {
+                callback(err);
+            } else {
+                let r = [];
+                results.forEach((obj) => {
+                    let model = new this(obj);
+                    r.push(model);
+                });
+                callback(null, r);
+            }
+        });
     }
 
     /**
@@ -194,29 +217,6 @@ module.exports = class Model {
         });
 
         return this.db.format(query, params);
-    }
-
-    static search(key, value, callback, page = 1, max = 20, sort = key, asc = true, strict = false) {
-        const db = require('../db/database');
-
-        let start = (page - 1) * max;
-        let ascdesc = asc ? 'asc' : 'desc';
-        let v = strict ? value : `%${value}%`;
-        let query = `select * from ?? where ?? COLLATE utf8mb4_general_ci like ? order by ?? ${ascdesc} limit ?,?`;
-        let params = [this.getTable(), key, v, key, start, max];
-
-        db.query(query, params, (err, results) => {
-            if (err) {
-                callback(err);
-            } else {
-                let r = [];
-                results.forEach((obj) => {
-                    let model = new this(obj);
-                    r.push(model);
-                });
-                callback(null, r);
-            }
-        });
     }
 
     /**

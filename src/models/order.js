@@ -64,7 +64,7 @@ module.exports = class Order extends Model {
             JOIN Products
                 ON Orders.productId = Products.id
             WHERE Orders.sellerId = ?
-            ORDER BY Orders.id ASC;`
+            ORDER BY Orders.id ASC;`;
 
         // const query = 'select * from ?? where `sellerId` = ?';
         const params = [Order.getTable(), userId];
@@ -108,15 +108,14 @@ module.exports = class Order extends Model {
     }
 
 
-
-    static getOrderByIDByTime(userId,time, callback, dryRun = false) {
+    static getOrderByIDByTime(userId, time, callback, dryRun = false) {
         const db = require('../db/database');
 
         // const query ='select productId , quantity from ?? where `sellerId` in ? and `created` = ?';
         // const query ='select productId , quantity from ?? where `sellerId` in (?) and `created` = ?';
-        const query ='SELECT productId , quantity FROM ?? WHERE `sellerId` in (?) and `created` = ?';
+        const query = 'SELECT productId , quantity FROM ?? WHERE `sellerId` in (?) and `created` = ?';
 
-        const params = [Order.getTable(), userId,time];
+        const params = [Order.getTable(), userId, time];
 
 
         if (!dryRun) db.query(query, params, (err, results) => {
@@ -136,12 +135,12 @@ module.exports = class Order extends Model {
     }
 
 
-    static getUsersFromOrder(Orders, callback,dryRun = false) {
+    static getUsersFromOrder(Orders, callback, dryRun = false) {
         const db = require('../db/database');
 
 
-       const query = 'SELECT Products.name ,Products.price , Users.firstName, Users.lastName  , Users.email FROM Products LEFT JOIN Users ON Users.id = Products.sellerId WHERE Products.id in (?)';
-       // const query = 'SELECT name, price, firstName, lastName, email FROM ?? LEFT JOIN ?? ON Users.id = Products.sellerId WHERE `id` in (?)';
+        const query = 'SELECT Products.name ,Products.price , Users.firstName, Users.lastName  , Users.email FROM Products LEFT JOIN Users ON Users.id = Products.sellerId WHERE Products.id in (?)';
+        // const query = 'SELECT name, price, firstName, lastName, email FROM ?? LEFT JOIN ?? ON Users.id = Products.sellerId WHERE `id` in (?)';
 
         const params = [Orders];
 
@@ -183,11 +182,6 @@ module.exports = class Order extends Model {
 
         return db.format(query, params);
     }
-
-
-
-
-
 
 
     // getUserTotalOnDate

@@ -2,7 +2,7 @@ const Model = require('./model.js');
 
 module.exports = class Manufacturer extends Model {
 
-    constructor(dbRow){
+    constructor(dbRow) {
         super(dbRow);
     }
 

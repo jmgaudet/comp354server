@@ -80,7 +80,8 @@ module.exports = class User extends Model {
             callback(null, value);
 
     }
-    static getRating(id,callback,dryrun=false) {
+
+    static getRating(id, callback, dryrun = false) {
         const db = require('../db/database');
 
         let params = [Rating.getTable(), id];
@@ -94,7 +95,8 @@ module.exports = class User extends Model {
         });
         return db.format(query, params);
     }
-    static getRatingBySeller(id,callback,dryrun=false) {
+
+    static getRatingBySeller(id, callback, dryrun = false) {
         const db = require('../db/database');
 
         let params = [Rating.getTable(), id];
@@ -108,6 +110,7 @@ module.exports = class User extends Model {
         });
         return db.format(query, params);
     }
+
     toJson() {
         return {
             id: this.id,

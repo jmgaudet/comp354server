@@ -128,7 +128,7 @@ module.exports = class CartController {
                 } else {
                     let message = `Item with productId ${productId} was not located in shopping cart`;
                     res.send(Response.makeResponse(false, message));
-                    return;
+
                 }
             });
 

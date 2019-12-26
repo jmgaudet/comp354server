@@ -3,9 +3,9 @@ const Category = require('./category.js');
 const Manufacturer = require('./manufacturer.js');
 const ProductImage = require('./productimage.js');
 
-module.exports = class Product extends Model{
+module.exports = class Product extends Model {
 
-    constructor(dbRow){
+    constructor(dbRow) {
         super(dbRow);
     }
 
@@ -17,11 +17,11 @@ module.exports = class Product extends Model{
         const db = require('../db/database');
 
         db.query("select count(*) as count from ??", [Product.getTable()], (err, results) => {
-            if(err) {
+            if (err) {
                 callback(err);
             }
             let count = results[0].count;
-            let pageCount = Math.ceil(count/max);
+            let pageCount = Math.ceil(count / max);
             let start = (page - 1) * max;
 
             let query = `SELECT 
@@ -45,7 +45,7 @@ module.exports = class Product extends Model{
             let params = [userId, orderColumn, start, max];
 
             db.query(query, params, (err, products) => {
-                if(err) {
+                if (err) {
                     callback(err);
                 }
                 products.forEach((prod) => {
@@ -92,11 +92,11 @@ module.exports = class Product extends Model{
         const db = require('../db/database');
 
         db.query("select count(*) as count from ??", [Product.getTable()], (err, results) => {
-            if(err) {
+            if (err) {
                 callback(err);
             }
             let count = results[0].count;
-            let pageCount = Math.ceil(count/max);
+            let pageCount = Math.ceil(count / max);
             let start = (page - 1) * max;
 
             let query = `SELECT 
@@ -122,7 +122,7 @@ module.exports = class Product extends Model{
             let params = [`%${search}%`, `%${search}%`, `%${search}%`, orderColumn, start, max];
 
             db.query(query, params, (err, products) => {
-                if(err) {
+                if (err) {
                     callback(err);
                 }
                 products.forEach((prod) => {
@@ -133,12 +133,13 @@ module.exports = class Product extends Model{
         });
 
     }
+
     getImages(callback, dryRun = false) {
         let params = [ProductImage.getTable(), this.id];
         let query = 'select * from ?? where productId = ?';
 
-        if(!dryRun) this.db.query(query, params, (err, results) => {
-            if(err) {
+        if (!dryRun) this.db.query(query, params, (err, results) => {
+            if (err) {
                 callback(err);
             } else {
                 let r = [];
@@ -156,8 +157,8 @@ module.exports = class Product extends Model{
         let params = [Manufacturer.getTable(), this.manufacturerId];
         let query = 'select * from ?? where id = ?';
 
-        if(!dryRun) this.db.query(query, params, (err, results) => {
-            if(err) {
+        if (!dryRun) this.db.query(query, params, (err, results) => {
+            if (err) {
                 callback(err);
             } else {
                 callback(null, new Manufacturer(results[0]));
@@ -171,8 +172,8 @@ module.exports = class Product extends Model{
         let params = [Category.getTable(), "ProductsCategories", this.id];
         let query = 'select * from ?? c where c.id in (select categoryId from ?? where productId = ?)';
 
-        if(!dryRun) this.db.query(query, params, (err, results) => {
-            if(err) {
+        if (!dryRun) this.db.query(query, params, (err, results) => {
+            if (err) {
                 callback(err);
             } else {
                 let r = [];
@@ -190,7 +191,7 @@ module.exports = class Product extends Model{
         let _this = this;
         let json = this.toJson();
         this.getCategories((err, categories) => {
-            if(err) {
+            if (err) {
                 callback(err);
             }
             json.categories = [];
@@ -198,12 +199,12 @@ module.exports = class Product extends Model{
                 json.categories.push(category.toJson());
             });
             _this.getManufacturer((err, manufacturer) => {
-                if(err) {
+                if (err) {
                     callback(err);
                 }
                 json.manufacturerName = manufacturer.name;
                 _this.getImages((err, images) => {
-                    if(err) {
+                    if (err) {
                         callback(err);
                     }
                     json.imageUrl = images[0].url;
@@ -218,7 +219,7 @@ module.exports = class Product extends Model{
         let _this = this;
         let json = this.toJson();
         this.getCategories((err, categories) => {
-            if(err) {
+            if (err) {
                 callback(err);
             }
             json.categories = [];
@@ -226,12 +227,12 @@ module.exports = class Product extends Model{
                 json.categories.push(category.toJson());
             });
             _this.getManufacturer((err, manufacturer) => {
-                if(err) {
+                if (err) {
                     callback(err);
                 }
                 json.manufacturer = manufacturer.toJson();
                 _this.getImages((err, images) => {
-                    if(err) {
+                    if (err) {
                         callback(err);
                     }
                     json.images = [];
@@ -249,8 +250,8 @@ module.exports = class Product extends Model{
         let query = "insert into ProductsCategories set productId = ?, categoryId = ?";
         let params = [this.id, categoryId];
 
-        this.db.query(query, params, (err,results) => {
-            if(err) {
+        this.db.query(query, params, (err, results) => {
+            if (err) {
                 callback(err);
             } else {
                 callback(null, true);
@@ -274,7 +275,7 @@ module.exports = class Product extends Model{
         });
         query += placeholders.join(',');
         this.db.query(query, params, (err, results) => {
-            if(err) {
+            if (err) {
                 callback(err);
             } else {
                 callback(null, true);

@@ -18,7 +18,7 @@ module.exports = class OrderController {
             let asc = req.query.asc && req.query.asc === 'true';
 
             Order.getAllSorted((err, orders, pages) => {
-                if(err) {
+                if (err) {
                     res.send(Response.makeResponse(false, err.toString()));
                 } else {
                     res.send(Response.makeResponse(true, `Got all orders page ${page}`, orders, pages));
@@ -71,9 +71,9 @@ module.exports = class OrderController {
                     return;
                 }
                 order.buyerId = user.id;
-                let name = user.firstName
-                let lastname = user.lastName
-                let email = user.email
+                let name = user.firstName;
+                let lastname = user.lastName;
+                let email = user.email;
 
                 ShoppingCart.getCartItems(order.buyerId, (err, items) => {
                     if (err || items.length === 0) {
@@ -129,7 +129,7 @@ module.exports = class OrderController {
                                             // console.log('The last iteration!');
 
                                             // console.log(time);
-                                            this.emailOrder(jsonOrderSummary,name,lastname,email,res)
+                                            this.emailOrder(jsonOrderSummary, name, lastname, email, res)
 
                                             // res.send(Response.makeResponse(true, "Order placed", jsonOrderSummary));
                                         }
@@ -162,58 +162,53 @@ module.exports = class OrderController {
     }
 
 
-        //function to prepare data for the purchase confirm email
-    static emailOrder(jsonOrderSummary,firstName,LastName,email,res){
+    //function to prepare data for the purchase confirm email
+    static emailOrder(jsonOrderSummary, firstName, LastName, email, res) {
 
-                    const Product = require('../models/product.js');
-                    //get complete order
+        const Product = require('../models/product.js');
+        //get complete order
 
-                    let totalPrice = 0;
-                    let orderSum ='';
-                    let sellerIDs = [];
-                    let orderIDs =[];
-                    jsonOrderSummary.forEach((item,index,array) => {
-                        let  id = item.productId;
-                        let cost = 0;
-                        let name  ='';
-                        let amount = '';
-                        Product.fromId(id, (err, prod) => {
-                            if(err)  {
-                                res.send(Response.makeResponse(false, err.toString()));
-                                return;
-                            }
-                            sellerIDs.push(item.sellerId);
-                            orderIDs.push(item.id);
-                            amount = item.quantity
-                            name = prod.name
-                            cost = prod.price
-                            orderSum = orderSum  +"<br></br>" + '<b>Product Name:</b> ' + name + ', <b>Quantity:</b> ' +  amount + ', <b>Price: $</b>' + cost ;
-                            totalPrice = totalPrice + parseInt(cost);
-                            if (index === jsonOrderSummary.length - 1){
+        let totalPrice = 0;
+        let orderSum = '';
+        let sellerIDs = [];
+        let orderIDs = [];
+        jsonOrderSummary.forEach((item, index, array) => {
+            let id = item.productId;
+            let cost = 0;
+            let name = '';
+            let amount = '';
+            Product.fromId(id, (err, prod) => {
+                if (err) {
+                    res.send(Response.makeResponse(false, err.toString()));
+                    return;
+                }
+                sellerIDs.push(item.sellerId);
+                orderIDs.push(item.id);
+                amount = item.quantity;
+                name = prod.name;
+                cost = prod.price;
+                orderSum = orderSum + "<br></br>" + '<b>Product Name:</b> ' + name + ', <b>Quantity:</b> ' + amount + ', <b>Price: $</b>' + cost;
+                totalPrice = totalPrice + parseInt(cost);
+                if (index === jsonOrderSummary.length - 1) {
 
-                                this.sellerEmail(sellerIDs,res,jsonOrderSummary,firstName,LastName,orderSum,totalPrice,orderIDs);
-                                // this.sendBuyerEmail(firstName,LastName,orderSum,totalPrice,jsonOrderSummary,email,sellerIDs,time,res);
-
-
-                            }
-
-                        });
-
-                    });
-
-
-
-
+                    this.sellerEmail(sellerIDs, res, jsonOrderSummary, firstName, LastName, orderSum, totalPrice, orderIDs);
+                    // this.sendBuyerEmail(firstName,LastName,orderSum,totalPrice,jsonOrderSummary,email,sellerIDs,time,res);
 
 
                 }
 
+            });
+
+        });
 
 
-        //this function creates the email that is sent when a user completes a purchase
-    static sendBuyerEmail(firstName, LastName, orderSum, totalPrice, jsonOrderSummary, email,sellerIDs,time,res) {
-        let sellers = sellerIDs
-        let timeCreated = time
+    }
+
+
+    //this function creates the email that is sent when a user completes a purchase
+    static sendBuyerEmail(firstName, LastName, orderSum, totalPrice, jsonOrderSummary, email, sellerIDs, time, res) {
+        let sellers = sellerIDs;
+        let timeCreated = time;
         const transporter = nodemailer.createTransport(sparkPostTransport({
             sparkPostApiKey: process.env.SPARKPOST_API_KEY
         }));
@@ -222,9 +217,9 @@ module.exports = class OrderController {
             to: '354testerlinda@gmail.com', //TODO: this is a temporary testing email account to receive the forgot password emails
             //to: email,               //TODO: once users have actual associated emails, we could use this
             subject: 'Thank You For Your Purchase',
-            html: 'Hi ' + firstName +' '+ LastName +','+
+            html: 'Hi ' + firstName + ' ' + LastName + ',' +
                 '<br></br><br></br>Thank You For Your Purchase, Your Order Has Been Placed.<br></br>' +
-                orderSum +'<br></br><br></br>'  +'<b>Total Price: $</b>' + totalPrice+ '<br></br><br></br>'
+                orderSum + '<br></br><br></br>' + '<b>Total Price: $</b>' + totalPrice + '<br></br><br></br>'
                 + 'Thank You For Your Business <br></br><br></br>' +
                 'Best, 354TheStars Team'
         };
@@ -238,64 +233,65 @@ module.exports = class OrderController {
         });
 
 
-
-
     }
 
 
-
-    static sellerEmail(sellerIDs,res,jsonOrderSummary,firstName,LastName,orderSum,totalPrice,orderIDs) {
+    static sellerEmail(sellerIDs, res, jsonOrderSummary, firstName, LastName, orderSum, totalPrice, orderIDs) {
 
 
         const transporter = nodemailer.createTransport(sparkPostTransport({
             sparkPostApiKey: process.env.SPARKPOST_API_KEY
         }));
-      ;
-        function onlyUnique(value, index, self) {return self.indexOf(value) === index;}
-        var sellers = sellerIDs.filter(onlyUnique);
-        let timeCreated = ''
-        console.log(sellers)
 
-        let quantities = []
-        let productIDS =[]
-        let sellerInfo
+
+        function onlyUnique(value, index, self) {
+            return self.indexOf(value) === index;
+        }
+
+        var sellers = sellerIDs.filter(onlyUnique);
+        let timeCreated = '';
+        console.log(sellers);
+
+        let quantities = [];
+        let productIDS = [];
+        let sellerInfo;
         let orders = orderIDs[0];
         console.log(orders);
 
         async.waterfall([
-            function getTime(callback){
+                function getTime(callback) {
 
-            Order.getOrderByOrderID(orders,(err,timeFromOrder)=>{
-                if (err) {
-                    res.send(Response.makeResponse(false, err.toString()));
-                }
-                console.log("gettime function")
-                console.log(timeFromOrder[0].created);
-
-
-                let orderTime = timeFromOrder[0].created;
-                let timeOrder = new Date(orderTime);
-                let d = new Date(orderTime);
-                d = (d.getTimezoneOffset() * 60000);
-                timeOrder = timeOrder - d;
-                let time = new Date(timeOrder);
-                timeCreated = time.toISOString();
-                timeCreated =timeCreated.slice(0, 19).replace('T', ' ');
-                console.log(timeCreated);
+                    Order.getOrderByOrderID(orders, (err, timeFromOrder) => {
+                        if (err) {
+                            res.send(Response.makeResponse(false, err.toString()));
+                        }
+                        console.log("gettime function");
+                        console.log(timeFromOrder[0].created);
 
 
-                callback(null,timeFromOrder);
-                });
+                        let orderTime = timeFromOrder[0].created;
+                        let timeOrder = new Date(orderTime);
+                        let d = new Date(orderTime);
+                        d = (d.getTimezoneOffset() * 60000);
+                        timeOrder = timeOrder - d;
+                        let time = new Date(timeOrder);
+                        timeCreated = time.toISOString();
+                        timeCreated = timeCreated.slice(0, 19).replace('T', ' ');
+                        console.log(timeCreated);
 
-            },
+
+                        callback(null, timeFromOrder);
+                    });
+
+                },
 
 
-           function  getOrder (arg1,callback) {
+                function getOrder(arg1, callback) {
                     Order.getOrderByIDByTime(sellers, timeCreated, (err, order) => {
                         if (err) {
                             res.send(Response.makeResponse(false, err.toString()));
                         }
-                       order.forEach((item, index) => {
+                        order.forEach((item, index) => {
                             productIDS.push(item.productId);
                             quantities.push(item.quantity);
                         });
@@ -306,56 +302,35 @@ module.exports = class OrderController {
                     });
 
                 },
-            function getUsers(arg2,callback) {
-            console.log("getting users");
-            console.log(productIDS);
+                function getUsers(arg2, callback) {
+                    console.log("getting users");
+                    console.log(productIDS);
 
-                Order.getUsersFromOrder(productIDS,(err,user) => {
+                    Order.getUsersFromOrder(productIDS, (err, user) => {
                         if (err) {
                             res.send(Response.makeResponse(false, err.toString()));
                         }
 
-                        console.log(user)
+                        console.log(user);
                         console.log("should be users here");
                         sellerInfo = user;
-                        callback(null,user);
+                        callback(null, user);
                     });
 
-            },
+                },
 
-            function sendEmails (arg2,callback) {
+                function sendEmails(arg2, callback) {
 
-                sellerInfo.forEach((item, index) => {
+                    sellerInfo.forEach((item, index) => {
 
-                    let PurchaseEmail = {
-                        from: 'no-reply@allanpichardo.com',
-                        to: '354testerlinda@gmail.com', //TODO: this is a temporary testing email account to receive the forgot password emails
-                        //to: email,               //TODO: once users have actual associated emails, we could use this
-                        subject: 'Congratulations You Sold Something!!',
-                        html: 'Hi ' + item.firstName + ' ' + item.lastName + ',' +
-                            '<br></br><br></br>Congratulations!!! You Sold These Item(s).<br></br><br></br>' + '<b>Product Name: </b>'+
-                        item.name + '<br></br><br></br>' + '<b>Total Price: $</b>' + item.price + '<br></br><br></br>'
-                            + 'Thank You For Your Business <br></br><br></br>' +
-                            'Best, 354TheStars Team'
-                    };
-
-                    transporter.sendMail(PurchaseEmail, function (err, info) {
-
-                        if (err) {
-                            res.send(Response.makeResponse(false, err.toString()));
-                        }
-
-                    });
-
-                    if(index === sellerInfo - 1) {
                         let PurchaseEmail = {
                             from: 'no-reply@allanpichardo.com',
                             to: '354testerlinda@gmail.com', //TODO: this is a temporary testing email account to receive the forgot password emails
                             //to: email,               //TODO: once users have actual associated emails, we could use this
                             subject: 'Congratulations You Sold Something!!',
                             html: 'Hi ' + item.firstName + ' ' + item.lastName + ',' +
-                                '<br></br><br></br>Congratulations!!! You Sold These Item(s).<br></br><br></br>' +
-                                '<b>Product Name: </b>' + item.name + '<br></br><br></br>' + '<b>Total Price: $</b>' + item.price + '<br></br><br></br>'
+                                '<br></br><br></br>Congratulations!!! You Sold These Item(s).<br></br><br></br>' + '<b>Product Name: </b>' +
+                                item.name + '<br></br><br></br>' + '<b>Total Price: $</b>' + item.price + '<br></br><br></br>'
                                 + 'Thank You For Your Business <br></br><br></br>' +
                                 'Best, 354TheStars Team'
                         };
@@ -366,23 +341,44 @@ module.exports = class OrderController {
                                 res.send(Response.makeResponse(false, err.toString()));
                             }
 
-                            callback(info);
-
-
                         });
 
-                    }
+                        if (index === sellerInfo - 1) {
+                            let PurchaseEmail = {
+                                from: 'no-reply@allanpichardo.com',
+                                to: '354testerlinda@gmail.com', //TODO: this is a temporary testing email account to receive the forgot password emails
+                                //to: email,               //TODO: once users have actual associated emails, we could use this
+                                subject: 'Congratulations You Sold Something!!',
+                                html: 'Hi ' + item.firstName + ' ' + item.lastName + ',' +
+                                    '<br></br><br></br>Congratulations!!! You Sold These Item(s).<br></br><br></br>' +
+                                    '<b>Product Name: </b>' + item.name + '<br></br><br></br>' + '<b>Total Price: $</b>' + item.price + '<br></br><br></br>'
+                                    + 'Thank You For Your Business <br></br><br></br>' +
+                                    'Best, 354TheStars Team'
+                            };
 
-                });
+                            transporter.sendMail(PurchaseEmail, function (err, info) {
+
+                                if (err) {
+                                    res.send(Response.makeResponse(false, err.toString()));
+                                }
+
+                                callback(info);
+
+
+                            });
+
+                        }
+
+                    });
 
 
                 }
 
-    ],
+            ],
             function (err, result) {
 
                 // res.send(Response.makeResponse(true, 'buyer and seller emails sent, buyer summary',jsonOrderSummary));
-        });
+            });
 
         const transporter2 = nodemailer.createTransport(sparkPostTransport({
             sparkPostApiKey: process.env.SPARKPOST_API_KEY
@@ -394,9 +390,9 @@ module.exports = class OrderController {
             to: '354testerlinda@gmail.com', //TODO: this is a temporary testing email account to receive the forgot password emails
             //to: email,               //TODO: once users have actual associated emails, we could use this
             subject: 'Thank You For Your Purchase',
-            html: 'Hi ' + firstName +' '+ LastName +','+
+            html: 'Hi ' + firstName + ' ' + LastName + ',' +
                 '<br></br><br></br>Thank You For Your Purchase, Your Order Has Been Placed.<br></br>' +
-                orderSum +'<br></br><br></br>'  +'<b>Total Price: $</b>' + totalPrice+ '<br></br><br></br>'
+                orderSum + '<br></br><br></br>' + '<b>Total Price: $</b>' + totalPrice + '<br></br><br></br>'
                 + 'Thank You For Your Business <br></br><br></br>' +
                 'Best, 354TheStars Team'
         };
@@ -410,7 +406,7 @@ module.exports = class OrderController {
 
         });
 
-        res.send(Response.makeResponse(true, 'buyer and seller emails sent, buyer summary',jsonOrderSummary));
+        res.send(Response.makeResponse(true, 'buyer and seller emails sent, buyer summary', jsonOrderSummary));
     }
 
 

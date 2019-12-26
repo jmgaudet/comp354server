@@ -12,13 +12,13 @@ module.exports = class UserController {
     static getAdminStats(req, res) {
         try {
             Order.getAllSaleStats((err, stats) => {
-                if(err) {
+                if (err) {
                     res.send(Response.makeResponse(false, err.toString()));
                 } else {
                     res.send(Response.makeResponse(true, "Got admin stats", stats));
                 }
             });
-        }catch(e) {
+        } catch (e) {
             res.send(Response.makeResponse(false, e.toString()));
         }
     }
@@ -28,7 +28,7 @@ module.exports = class UserController {
             let userId = req.params.id;
 
             Order.getSalesByUser(userId, (err, orders) => {
-                if(err) {
+                if (err) {
                     res.send(Response.makeResponse(false, err.toString()));
                 } else {
                     let totalSold = 0;
@@ -47,7 +47,7 @@ module.exports = class UserController {
                     res.send(Response.makeResponse(true, "Got sale stats", stats));
                 }
             });
-        }catch (e) {
+        } catch (e) {
             res.send(Response.makeResponse(false, e.toString()));
         }
     }
@@ -417,20 +417,20 @@ module.exports = class UserController {
     }
 
 //sends a thank you / welcome
-    static signUpEmail(req,res) {
+    static signUpEmail(req, res) {
         let email = req.body.email;
         try {
             User.fromEmail(email, (err, user) => {
                 if (err) {
                     res.send(Response.makeResponse(false, err.toString()));
 
-                    return;
-                }else
-                //Check email matches in the database
+
+                } else
+                    //Check email matches in the database
                 if (user.email === email) {
                     let foundUser = user.toJson();
-                    let name = foundUser.firstName
-                    let lastname = foundUser.lastName
+                    let name = foundUser.firstName;
+                    let lastname = foundUser.lastName;
 
 
                     const transporter = nodemailer.createTransport(sparkPostTransport({
@@ -442,7 +442,7 @@ module.exports = class UserController {
                         to: '354testerlinda@gmail.com', //TODO: this is a temporary testing email account to receive the forgot password emails
                         //to: email,               //TODO: once users have actual associated emails, we could use this
                         subject: 'Thank You For Signing Up To 354TheStars Website',
-                        html: 'Welcome, ' + name  +' '+ lastname +'<br></br><br>Thank You For Registering!! </br>' +
+                        html: 'Welcome, ' + name + ' ' + lastname + '<br></br><br>Thank You For Registering!! </br>' +
                             'Enjoy Your Shopping Experience.<br></br><br></br>' +
                             'Best,<br></br>354TheStars Team'
                     };
@@ -459,8 +459,7 @@ module.exports = class UserController {
                     res.send(Response.makeResponse(false, 'User welcome email not sent'));
                 }
             });
-        }
-        catch (e) {
+        } catch (e) {
             res.send(Response.makeResponse(false, e.toString()));
         }
 
